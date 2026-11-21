@@ -85,9 +85,9 @@ const CARDS = [
     art: pixelArt(['F.....F.O.....O', 'FFFFFFF.OOOWOOO', 'FAFFFAF.OEOWOEO', 'FFFPFFF.OOWPWOO', '.FyyyF...WWWWW.', '.FFFFF...OWWWO.', 'FFFFFFF.OOWWWOO', 'FFFFFFF.OOWWWOO'],
                   { ...BP, F:'#c19a6b', A:'#7a4a10', y:'#f8dcae' }, 'radial-gradient(circle at 50% 45%,#fffbe8 0 34%,#f2c14e 60%,#6a3a12 100%)') },
   // The real cats: photo cards. Legendary, like the rest of Yoko and Echo's cards.
-  { id:'echo-photo', star:'Echo', name:'Echo', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Echo, caught mid-stare.',
+  { set:'echo', id:'echo-photo', star:'Echo', name:'Echo', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Echo, caught mid-stare.',
     art: "url('echo.jpg') 50% 38% / cover no-repeat" },
-  { id:'yoko-photo', star:'Yoko', name:'Yoko', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Yoko, fluffy and unbothered.',
+  { set:'yoko', id:'yoko-photo', star:'Yoko', name:'Yoko', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Yoko, fluffy and unbothered.',
     art: "url('yoko.jpg') 50% 32% / cover no-repeat" },
   // More memes, with other cats.
   { id:'buffer', name:'Buffering', rarity:'common', glyph:'', ink:'#3a2410', flavour:'Staring at the wall. Loading. Please wait.',
@@ -122,6 +122,51 @@ function pixelArt(rows, pal, behind) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges">${rects}</svg>`;
   return `url('data:image/svg+xml,${encodeURIComponent(svg)}') center / 78% auto no-repeat, ${behind}`;
 }
+/* ================= the cats' own packs: Echo pack and Yoko pack, 12 cards each (each cat's photo card is in its pack) ================= */
+const edit = (rows, ...changes) => { const g = rows.map(r => [...r]); changes.flat().forEach(([y, x, ch]) => { g[y][x] = ch; }); return g.map(r => r.join('')); };   // paint extra pixels onto a grid
+const seg = (y, x, str) => [...str].map((ch, i) => [y, x + i, ch]).filter(c => c[2] !== ' ');                                                                // a run of pixels in one row
+const ECHO_ROWS = ['.O..........O.', '.OO........OO.', '.OpOOOWWOOOpO.', 'OOOOOoWWoOOOOO', 'OOLLLOWWOLLLOO', 'OOEKEOWWOEKEOO', 'OOOOWWWWWWOOOO', '.OOWWWPPWWWOO.',
+                   '..WWWWWWWWWW..', '...WWWWWWWW...', '...WWWWwWWW...', '...WWwWWWWW...'];
+const YOKO_ROWS = ['.Ff........fF.', '.FF........FF.', '.FpFFFFFFFFpF.', 'FFFFsFsFsFFFFF', 'FFAKAFFFFAKAFF', 'FFAAAFFFFAAAFF', 'FFFFFFPPFFFFFF', 'fFFFFwwwwFFFFf', '.FFFFwwwwFFFF.', '..FFFFFFFFFF..'];
+const ECHO_P = { ...BP, B:'#ff7fb0', b:'#d94a8a', H:'#7b4cf0', h:'#ffd84a', Y:'#f2c14e', D:'#2b2540', R:'#e8527f', Q:'#fff3a0', c:'#ffffff' };
+const YOKO_P = { ...FP, B:'#ff7fb0', b:'#d94a8a', H:'#7b4cf0', h:'#ffd84a', D:'#2b2540', Q:'#fff3a0', U:'#7ac0ff', X:'#7a5a8a', c:'#ffffff' };
+const echoCard = (id, name, rarity, ink, flavour, behind, ...changes) => ({ set:'echo', id, star:'Echo', name, rarity, glyph:'', ink, flavour, art: pixelArt(edit(ECHO_ROWS, ...changes), ECHO_P, behind) });
+const yokoCard = (id, name, rarity, ink, flavour, behind, ...changes) => ({ set:'yoko', id, star:'Yoko', name, rarity, glyph:'', ink, flavour, art: pixelArt(edit(YOKO_ROWS, ...changes), YOKO_P, behind) });
+const GOLDBG = 'radial-gradient(circle at 50% 45%,#fffbe8 0 34%,#f2c14e 62%,#6a3a12 100%)', NIGHTBG = 'linear-gradient(160deg,#2b2a5e,#5a4a9a)';
+SETS.echo = { name: 'Echo pack', title: 'Echo Series', reward: 'Echo put on a bow',
+  art: pixelArt(ECHO_ROWS.slice(0, 10), BP, RAYS + ', radial-gradient(circle,#fff6dc,#ffd9a0 70%)') };
+SETS.yoko = { name: 'Yoko pack', title: 'Yoko Series', reward: 'Yoko put on a crown',
+  art: pixelArt(YOKO_ROWS, FP, RAYS + ', radial-gradient(circle,#fff0d6,#ffc98a 70%)') };
+CARDS.push(
+  // Echo: 4 common, 3 uncommon, 3 rare, and the legendaries (her photo card and Queen Echo)
+  echoCard('e-sleepy', 'Sleepy Echo', 'common', '#ffffff', 'Five more minutes. Then five more.', NIGHTBG, seg(5, 2, 'KKK'), seg(5, 9, 'KKK'), [[0, 8, 'Q'], [1, 10, 'Q']]),
+  echoCard('e-yawn', 'Big Yawn', 'common', '#5a1f3a', 'Opens wide for one reason: snacks.', 'linear-gradient(160deg,#ffe8d0,#ffc9a0)', seg(5, 2, 'KKK'), seg(5, 9, 'KKK'), seg(8, 5, 'mmmm'), seg(9, 6, 'PP')),
+  echoCard('e-window', 'Window Watch', 'common', '#1d2540', 'Supervising the birds. Very serious work.', 'linear-gradient(180deg,#bfe6ff,#e8f6ff)', seg(5, 2, 'EEK'), seg(5, 9, 'EEK'), seg(0, 3, 'cc'), seg(1, 3, 'ccc'), seg(0, 10, 'cc'), seg(1, 9, 'ccc')),
+  echoCard('e-paws', 'Toe Beans', 'common', '#3b2470', 'Toe beans, fully loaded.', 'linear-gradient(160deg,#f0e6ff,#d4b8ff)', seg(11, 3, 'pWpWWpWp')),
+  echoCard('e-bow', 'Bow Echo', 'uncommon', '#5a1f3a', 'Fancy. Knows it.', 'linear-gradient(160deg,#ffe3f0,#ffb3d4)', seg(0, 5, 'B  B'), seg(1, 5, 'BbbB')),
+  echoCard('e-detective', 'Detective Echo', 'uncommon', '#1d2540', 'Has questions. Mostly about dinner.', 'linear-gradient(160deg,#dfe6f1,#8da0c2)',
+    seg(4, 1, 'DDDDD'), seg(6, 1, 'DDDDD'), [[5, 1, 'D'], [5, 5, 'D']], seg(4, 8, 'DDDDD'), seg(6, 8, 'DDDDD'), [[5, 8, 'D'], [5, 12, 'D']]),
+  echoCard('e-scarf', 'Scarf Season', 'uncommon', '#5a2a00', 'It is 30 degrees. Echo insists.', 'linear-gradient(160deg,#ffe9a0,#ffb36b)', seg(9, 3, 'RRRRRRRR'), seg(10, 9, 'RR')),
+  echoCard('e-cloud', 'Cloud Nap', 'rare', '#1d2540', 'Floats on a cloud of pure laziness.', 'linear-gradient(180deg,#8fd0ff,#e8f6ff)',
+    seg(5, 2, 'KKK'), seg(5, 9, 'KKK'), seg(9, 0, 'cc'), seg(10, 0, 'ccc'), seg(11, 0, 'cccc'), seg(9, 12, 'cc'), seg(10, 11, 'ccc'), seg(11, 10, 'cccc')),
+  echoCard('e-star', 'Wish Upon', 'rare', '#fff3a0', 'Wishes on every star. Same wish every time: snacks.', 'radial-gradient(circle at 50% 30%,#4a3f8a,#151640 75%)',
+    [[0, 3, 'Q'], [1, 0, 'Q'], [0, 10, 'Q'], [1, 13, 'Q'], [9, 1, 'Q'], [10, 12, 'Q']]),
+  echoCard('e-party', 'Birthday Echo', 'rare', '#5a1f3a', 'Another year of being perfect.', 'linear-gradient(150deg,#ff9ec2,#ffe08a)', seg(0, 6, 'hh'), seg(1, 5, 'HHHH')),
+  echoCard('e-queen', 'Queen Echo', 'legendary', '#3a2200', 'Bow before the sofa queen.', GOLDBG, seg(0, 4, 'Y YY Y'), seg(1, 4, 'YYYYYY'), seg(1, 6, 'RR')),
+  // Yoko: 4 common, 3 uncommon, 3 rare, and the legendaries (his photo card and Fluff Lord)
+  yokoCard('y-fluff', 'Fluff Ball', 'common', '#3a2410', 'Mostly fur. Some cat inside.', 'linear-gradient(160deg,#fff0d6,#ffc98a)', []),
+  yokoCard('y-spy', 'Sofa Spy', 'common', '#123a28', 'Peeking over the sofa. Plotting.', 'linear-gradient(160deg,#e8f6ee,#9fd6b8)', seg(8, 0, 'XXXXXXXXXXXXXX'), seg(9, 0, 'XXXXXXXXXXXXXX')),
+  yokoCard('y-big', 'Big Eyes', 'common', '#1d2540', 'Pupils: fully dilated. Reason: snacks.', 'linear-gradient(160deg,#dfe6f1,#8da0c2)', seg(4, 2, 'cKK'), seg(4, 9, 'cKK'), seg(5, 2, 'KKK'), seg(5, 9, 'KKK')),
+  yokoCard('y-sleepy', 'Sleepy Yoko', 'common', '#ffffff', 'Powers down mid-zoomie.', NIGHTBG, seg(4, 2, 'FFF'), seg(5, 2, 'KKK'), seg(4, 9, 'FFF'), seg(5, 9, 'KKK'), [[0, 4, 'Q'], [1, 6, 'Q']]),
+  yokoCard('y-flower', 'Flower Crown', 'uncommon', '#5a1f3a', 'Spring has arrived. Yoko was not consulted.', 'linear-gradient(160deg,#ffe3ee,#ffa8c8)', seg(2, 3, 'BhBhBhBh')),
+  yokoCard('y-shades', 'Shades', 'uncommon', '#ffffff', 'Too cool for the vet.', 'linear-gradient(150deg,#0f2d6b,#2b7fe0 55%,#8fd0ff)', seg(4, 1, 'DDDDD'), seg(4, 6, 'DD'), seg(4, 8, 'DDDDD'), seg(5, 1, 'DDDDD'), seg(5, 8, 'DDDDD')),
+  yokoCard('y-rain', 'Rainy Day', 'uncommon', '#1d2540', 'Rainy afternoon. Window seat: taken.', 'linear-gradient(160deg,#b8c4d8,#6a7a9a)', [[0, 3, 'U'], [0, 6, 'U'], [0, 9, 'U'], [1, 4, 'U'], [1, 7, 'U'], [1, 10, 'U']]),
+  yokoCard('y-pirate', 'Pirate Yoko', 'rare', '#ffffff', 'Arr. The treat drawer be mine.', 'linear-gradient(160deg,#1a3a5c,#3a8fd0)', seg(4, 9, 'DDD'), seg(5, 9, 'DDD'), seg(2, 3, 'RRRRRRRR')),
+  yokoCard('y-wizard', 'Wizard Yoko', 'rare', '#fff3a0', 'Casts Summon Treat. Very effective.', 'radial-gradient(circle at 50% 35%,#6a4aa0,#1d1450 80%)', seg(0, 6, 'HH'), seg(1, 4, 'HHHHHH'), seg(2, 2, 'HHHHHHHHHH'), [[1, 6, 'h'], [0, 3, 'Q'], [0, 10, 'Q']]),
+  yokoCard('y-space', 'Space Yoko', 'rare', '#fff3a0', 'One small step for cat. One giant leap off the shelf.', 'radial-gradient(circle at 80% 20%,#ff9ec2 0 12%,transparent 13%),radial-gradient(circle at 50% 40%,#2a1f86,#0a0630 80%)',
+    seg(9, 2, 'cccccccccc'), [[0, 4, 'Q'], [0, 9, 'Q'], [1, 6, 'Q'], [1, 13, 'Q']]),
+  yokoCard('y-lord', 'Fluff Lord', 'legendary', '#3a2200', 'Rules the sofa, the bed and all of the snacks.', GOLDBG, seg(0, 4, 'Y YY Y'), seg(1, 4, 'YYYYYY'), seg(1, 6, 'RR')),
+);
 CARDS.forEach(c => { c.set ||= 'cats'; });
 const inSet = k => CARDS.filter(c => c.set === k);
 // Copies other people already hold, so serial numbers look like a live set.
@@ -849,9 +894,13 @@ function block(x, y, c, lift, tint) {
 const TRUNK = [120, 84, 52];
 // The mascot: Echo, the owner's orange-and-white cat, in blocks, sitting. Cream-orange fur, white blaze, muzzle, chest and paws, sleepy eyes.
 // Yoko, the fluffy orange cat, sits to Echo's left with wide-open eyes.
-const YOKO_PAL = { F: [193, 154, 107], f: [154, 117, 73], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28] };
-const yokoRows = t => ['F.....F', 'FFfFfFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'];   // tabby stripes, pale chest
-const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [168, 154, 72], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
+const YOKO_PAL = { F: [193, 154, 107], f: [154, 117, 73], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28], Y: [242, 193, 78] };
+const yokoRows = t => {
+  const rows = ['F.....F', 'FFfFfFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'];   // tabby stripes, pale chest
+  if ((S.done || []).includes('yoko')) rows[0] = 'F.YYY.F';                  // Yoko pack complete: a crown
+  return rows;
+};
+const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], V: [255, 127, 176], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [168, 154, 72], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
 // Each eye is painted on its block's top face: amber iris, dark pupil, glint, and a fur-coloured lid over the top third (sleepy, not shut).
 let hopT = -1e9, awakeUntil = 0;                           // last catch (the cat hops), and how long it stays awake at night
 const catAsleep = t => phaseKey === 'night' && !scene.waving && t > awakeUntil && score < 25;
@@ -867,6 +916,7 @@ function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36, iris = BOT_PAL.E)
 function botRows(t) {
   const rows = ['O.....O', 'OOOWOOO', 'OEOWOEO', 'OOWPWOO', '.WWWWW.', '.oWWWo.', '.OWWWO.', '.WW.WW.'];
   if ((S.done || []).includes('dev')) rows[4] = '.BBBBB.';            // Dev pack complete: a scarf
+  if ((S.done || []).includes('echo')) rows[0] = 'OVV.VVO';           // Echo pack complete: a pink bow between the ears
   if (score >= 25) rows[2] = 'OSSSSSO';                             // 25 caught: a visor
   else if (catAsleep(t)) rows[2] = 'OoOWOoO';                       // asleep at night until someone taps
   else if (t % 5200 < 160) rows[2] = 'OOOWOOO';                     // slow blink
