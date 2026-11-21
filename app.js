@@ -1586,11 +1586,11 @@ function drawEffects(t) {
 }
 
 function spawnPack(t) {
-  if (reduced() || t < nextPack || packs.length >= 5) return;
+  if (reduced() || t < nextPack || packs.length >= 7) return;
   const pr = $('panel').getBoundingClientRect(), side = !mobile() && !$('profileView').hidden;
   const minX = side ? pr.right + 30 : 24, maxX = W - 24;
   if (maxX - minX > 40) packs.push({ x: minX + Math.random() * (maxX - minX), y: -40, vy: H / (8 + Math.random() * 4), sway: Math.random() * 6, rot: (Math.random() - .5) * .6, vr: (Math.random() - .5) * .8, gold: Math.random() < .06, kind: Math.floor(Math.random() * SNACKS.length) });
-  nextPack = t + 1400 + Math.random() * 2200;
+  nextPack = t + 800 + Math.random() * 1400;
 }
 function renderScore(bump) {
   const el = $('score'); el.hidden = !score && !eggs.length;
