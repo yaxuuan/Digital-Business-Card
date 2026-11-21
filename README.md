@@ -55,3 +55,6 @@ Eleven things in the scenes react to a tap, and a counter beside the cat score t
 ## License
 
 MIT, see `LICENSE`.
+
+## Sibling pack
+Six real photos of Echo and Yoko together (`sib1.jpg` to `sib6.jpg`), all legendary. Defined as `SETS.siblings` in app.js.

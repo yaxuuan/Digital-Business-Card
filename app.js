@@ -167,6 +167,16 @@ CARDS.push(
     seg(9, 2, 'cccccccccc'), [[0, 4, 'Q'], [0, 9, 'Q'], [1, 6, 'Q'], [1, 13, 'Q']]),
   yokoCard('y-lord', 'Fluff Lord', 'legendary', '#3a2200', 'Rules the sofa, the bed and all of the snacks.', GOLDBG, seg(0, 4, 'Y YY Y'), seg(1, 4, 'YYYYYY'), seg(1, 6, 'RR')),
 );
+SETS.siblings = { name: 'Sibling pack', title: 'Sibling Series', reward: 'bragging rights as the proudest cat parent',
+  art: "url('sib3.jpg') 50% 45% / cover no-repeat" };
+// The six real photos of Echo and Yoko together. All legendary, so any pack from this set is a jackpot.
+[ ['sib-stare', 'The Stare-off', 'sib1.jpg', '50% 70%', 'Yoko watches. Echo judges.'],
+  ['sib-stroller', 'Stroller Snuggle', 'sib2.jpg', '50% 55%', 'Two warm loaves, one stroller.'],
+  ['sib-box', 'Box Buddies', 'sib3.jpg', '50% 50%', 'If it fits, they both sit.'],
+  ['sib-peek', 'Stroller Peek', 'sib4.jpg', '50% 65%', 'Echo naps while Yoko keeps watch.'],
+  ['sib-window', 'Window Seat', 'sib5.jpg', '50% 62%', 'Echo on the sofa, Yoko on patrol.'],
+  ['sib-floor', 'Floor Loaf', 'sib6.jpg', '50% 55%', 'Yoko peeks round the corner at Echo.'],
+].forEach(([id, name, img, pos, flavour]) => CARDS.push({ set:'siblings', id, star:'Echo & Yoko', name, rarity:'legendary', glyph:'', ink:'#ffffff', flavour, art: `url('${img}') ${pos} / cover no-repeat` }));
 CARDS.forEach(c => { c.set ||= 'cats'; });
 const inSet = k => CARDS.filter(c => c.set === k);
 // Copies other people already hold, so serial numbers look like a live set.
