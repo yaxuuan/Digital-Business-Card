@@ -44,6 +44,7 @@
       <p class="bio" id="bio"></p>
       <div class="projects" id="projects"></div>
       <button class="btn" id="helloBtn">Send me your details</button>
+      <button class="btn" id="dressBtn">Dress up Echo and Yoko</button>
       <div class="shelf" id="setPick" role="group" aria-label="Choose a pack"></div>
       <a class="strip" href="#binder" aria-label="Open your binder">
         <span class="strip-head"><b>Collection</b><span id="binderCount"></span><i>View binder →</i></span>
@@ -59,7 +60,22 @@
     <button class="back" id="backBtn">← Back to profile</button>
     <div class="bhead"><h2 id="binderTitle">Your binder</h2><span class="totals" id="totals"></span></div>
     <div class="owner"><b id="ownerName"></b><span id="ownerProgress"></span></div>
+    <button class="btn" id="dressBtn2">Spend treats: dress up the cats →</button>
     <div class="sets" id="binderGrid"></div>
+  </section>
+</main>
+
+<main class="wrap" id="dressView" hidden>
+  <section class="panel" aria-labelledby="dressTitle">
+    <button class="back" id="dressBack">← Back to profile</button>
+    <div class="bhead"><h2 id="dressTitle">Dress up the cats</h2><span class="totals" id="dressTreats"></span></div>
+    <div class="dress-who" id="dressWho" role="group" aria-label="Choose a cat">
+      <button class="chip-btn" data-who="echo">Echo</button><button class="chip-btn" data-who="yoko">Yoko</button>
+    </div>
+    <div class="dress-stage"><canvas id="dressCanvas" width="196" height="308" aria-label="Preview of the cat"></canvas></div>
+    <div class="dress-bar" id="dressBar" aria-live="polite"></div>
+    <div id="dressShop"></div>
+    <p class="note">Treats come from duplicate cards. Once you own something, both cats can wear it. They wear it on the card page too.</p>
   </section>
 </main>
 

@@ -418,3 +418,23 @@ details.odds summary:hover { color:var(--fg); border-color:#e0508f; }
 }
 .cback span { background:#4a1f66; }
 .stage-wrap { background-image:radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--rc, #ff6fa8) 26%, transparent), transparent 60%); background-color:#2a1740; }
+
+/* dress up the cats */
+#dressView.peek .panel { display:none; }
+.note { margin:0; font-size:13px; color:var(--muted); }
+.dress-who { display:flex; gap:8px; }
+.chip-btn { flex:1; border:2px solid #4a2545; border-radius:99px; padding:9px 14px; background:rgba(255,255,255,.7); color:#4a2545; font:600 15px var(--display); }
+.chip-btn[aria-pressed="true"] { background:#ff9ec8; box-shadow:0 3px 0 rgba(120,50,120,.3); }
+.dress-stage { display:grid; place-items:center; padding:12px; border-radius:20px; background:linear-gradient(160deg,#fff6dc,#ffd9e8 60%,#d9c8ff); }
+.dress-stage canvas { width:min(196px,52vw); height:auto; image-rendering:pixelated; }
+.dress-bar { display:flex; gap:8px; align-items:center; justify-content:space-between; min-height:46px; flex-wrap:wrap; font-size:14px; }
+.dress-bar .btn { flex:1 1 140px; }
+.dress-bar .btn:disabled { opacity:.55; }
+.dress-bar span { color:var(--muted); }
+.dress-slot h3 { margin:6px 0 8px; font:700 15px var(--display); }
+.dress-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:8px; }
+.gear { display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 6px; border-radius:16px; border:2px solid transparent; background:rgba(255,255,255,.7); color:#4a2545; font:600 12px var(--display); text-align:center; }
+.gear i { width:44px; height:44px; border-radius:12px; background-color:#f3e6f6; background-repeat:no-repeat; background-position:center; background-size:80%; image-rendering:pixelated; }
+.gear small { font:500 11px var(--mono); color:var(--muted); }
+.gear.sel { border-color:#d6408a; }
+.gear.on small { color:#2a8a5a; font-weight:700; }

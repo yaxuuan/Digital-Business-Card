@@ -1002,7 +1002,7 @@ function pdisc(cx, cy, r, c, a = 1) {                       // a circle made of 
 // Where the sun or moon sits. If the card panel would cover it, it slides to just right of the panel when there is room.
 function bodyXY(P) {
   const b = P.body, y = H * b.y; let x = mobile() ? W * Math.min(.82, Math.max(.18, b.x)) : W * b.x;
-  const view = $('profileView').hidden ? $('binderView') : $('profileView');
+  const view = ['profileView', 'binderView', 'dressView'].map($).find(v => !v.hidden);
   if (!view.classList.contains('peek')) {
     const r = view.querySelector('.panel').getBoundingClientRect(), m = b.r * 1.6;
     if (x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m && r.right + m * 2.4 < W) x = r.right + m * 1.5;   // on phones there is no room: Hide card shows it
@@ -1362,6 +1362,7 @@ function drawFigures(t, P) {                                // tree or lamp, and
     if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint);
   }));
   if ((S.done || []).includes('cats')) [[1, 0], [3, -1], [5, 0], [2, 0], [4, 0]].forEach(([k, up]) => block(bx + k * cs, by - cs + up * cs, BOT_PAL.Y, 0, tint));   // Cat pack complete: a crown
+  drawGear('echo', bx, by, t, tint);
   const yx = (botC - 10) * cs, yy = groundTop(botC) - 8 * cs - hop * .6, yr = yokoRows(t);   // Yoko
   const ysw = Math.sin(t * .0017 + 2) * .45;
   [[0, 7, 'F'], [-1, 7, 'F'], [-2, 7, 'f'], [-1, 6, 'F'], [-2, 6, 'F'], [-3, 6, 'f'], [-2, 5, 'F']].forEach(([dx, dy, ch]) => block(yx + dx * cs, yy + dy * cs, YOKO_PAL[ch], liftAt(yx + dx * cs, yy + dy * cs, t), tint));   // bushy tail
@@ -1372,6 +1373,7 @@ function drawFigures(t, P) {                                // tree or lamp, and
     block(x, y, YOKO_PAL[ch], lift, tint);
     if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint, YOKO_PAL.F, .12, [208, 128, 36]);   // Yoko: deep amber eyes
   }));
+  drawGear('yoko', yx, yy, t, tint);
   drawBench(t, tint);
 }
 
@@ -1710,11 +1712,106 @@ requestAnimationFrame(frame);
 if (!store.get('cardstock-hint', false)) { $('intro').hidden = false; $('introOk').onclick = () => { $('intro').hidden = true; store.set('cardstock-hint', true); }; }
 $('moreBtn').onclick = () => { const open = $('panel').classList.toggle('open'); $('moreBtn').setAttribute('aria-expanded', open); $('moreBtn').textContent = open ? 'Show less' : 'More about me'; };
 
+/* ================= dress up: spend treats on things for the cats to wear ================= */
+// Each item is a few blocks placed around a cat: x 0..6 across, y 0 is the ear row, negative y is above the head. Colours are keyed by letter.
+const GEAR = [
+  { id:'beanie', slot:'hat', name:'Beanie', cost:8, pal:{ a:[70,120,220], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,-1,'a']), ...[2,3,4].map(x => [x,-2,'a']), [3,-3,'b']] },
+  { id:'flower', slot:'hat', name:'Flower Crown', cost:12, pal:{ a:[255,150,190], b:[255,255,255] }, cells:[1,2,3,4,5].map(x => [x,-1,x % 2 ? 'a' : 'b']) },
+  { id:'party', slot:'hat', name:'Party Hat', cost:10, pal:{ a:[255,127,176], b:[242,193,78] }, cells:[[2,-1,'a'],[3,-1,'b'],[4,-1,'a'],[3,-2,'a'],[3,-3,'b']] },
+  { id:'topper', slot:'hat', name:'Top Hat', cost:15, pal:{ a:[40,36,52], b:[200,50,60] }, cells:[...[1,2,3,4,5].map(x => [x,-1,'a']), ...[2,3,4].map(x => [x,-2,'b']), ...[2,3,4].map(x => [x,-3,'a'])] },
+  { id:'cowboy', slot:'hat', name:'Cowboy Hat', cost:15, pal:{ a:[150,100,56], b:[110,70,36] }, cells:[...[0,1,2,3,4,5,6].map(x => [x,-1,'b']), ...[2,3,4].map(x => [x,-2,'a'])] },
+  { id:'witch', slot:'hat', name:'Witch Hat', cost:20, pal:{ a:[96,60,170], b:[242,193,78] }, cells:[...[0,1,2,3,4,5,6].map(x => [x,-1,'a']), [2,-2,'a'], [3,-2,'b'], [4,-2,'a'], [3,-3,'a']] },
+  { id:'halo', slot:'hat', name:'Halo', cost:25, pal:{ a:[255,226,120] }, cells:[[1,-2,'a'],[5,-2,'a'],[2,-3,'a'],[3,-3,'a'],[4,-3,'a']] },
+  { id:'bell', slot:'neck', name:'Bell Collar', cost:6, pal:{ a:[220,60,70], b:[250,210,80] }, cells:[...[1,2,3,4,5].map(x => [x,4,'a']), [3,5,'b']] },
+  { id:'bowtie', slot:'neck', name:'Bow Tie', cost:8, pal:{ a:[255,110,160], b:[255,220,230] }, cells:[[2,4,'a'],[3,4,'b'],[4,4,'a']] },
+  { id:'scarf', slot:'neck', name:'Striped Scarf', cost:10, pal:{ a:[220,60,70], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,4,x % 2 ? 'a' : 'b']), [5,5,'a'], [5,6,'b']] },
+  { id:'bandana', slot:'neck', name:'Bandana', cost:12, pal:{ a:[70,120,220], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,4,'a']), [2,5,'a'], [3,5,'b'], [4,5,'a'], [3,6,'a']] },
+  { id:'medal', slot:'neck', name:'Gold Medal', cost:20, pal:{ a:[70,120,220], b:[250,210,80] }, cells:[[2,4,'a'],[3,4,'a'],[4,4,'a'],[3,5,'b'],[3,6,'b']] },
+  { id:'blush', slot:'face', name:'Blush', cost:5, pal:{ a:[255,140,170] }, cells:[[1,3,'a'],[5,3,'a']] },
+  { id:'patch', slot:'face', name:'Eye Patch', cost:6, pal:{ a:[30,28,45] }, cells:[[5,2,'a']] },
+  { id:'shades', slot:'face', name:'Sunglasses', cost:12, pal:{ a:[30,28,45] }, cells:[1,2,3,4,5].map(x => [x,2,'a']) },
+  { id:'heartspecs', slot:'face', name:'Heart Glasses', cost:14, pal:{ a:[255,90,150], b:[200,50,110] }, cells:[[1,2,'a'],[2,2,'b'],[3,2,'b'],[4,2,'b'],[5,2,'a']] },
+  { id:'starspecs', slot:'face', name:'Star Glasses', cost:14, pal:{ a:[255,214,60], b:[230,170,30] }, cells:[[1,2,'a'],[2,2,'b'],[3,2,'b'],[4,2,'b'],[5,2,'a']] },
+];
+const GEAR_SLOTS = [['hat', 'Hats'], ['neck', 'Neckwear'], ['face', 'Face']];
+const gearById = id => GEAR.find(g => g.id === id);
+const CAT_NAMES = { echo: 'Echo', yoko: 'Yoko' };
+function loadDress() {                                      // read the saved wardrobe, keeping only items that exist, are owned and fit their slot
+  const d = store.get('cardstock-dress', null) || {}, owned = (Array.isArray(d.owned) ? d.owned : []).filter(id => gearById(id)), worn = {};
+  for (const who of Object.keys(CAT_NAMES)) {
+    worn[who] = {};
+    for (const [slot, id] of Object.entries((d.worn || {})[who] || {})) if (owned.includes(id) && gearById(id) && gearById(id).slot === slot) worn[who][slot] = id;
+  }
+  return { owned: [...new Set(owned)], worn };
+}
+let dress = loadDress();
+const saveDress = () => store.set('cardstock-dress', dress);
+function drawGear(who, ox, oy, t, tint) {                   // blocks on top of the cat in the scene
+  for (const id of Object.values(dress.worn[who] || {})) {
+    const g = gearById(id);
+    g.cells.forEach(([x, y, k]) => { const px = ox + x * cs, py = oy + y * cs; block(px, py, g.pal[k], y >= 0 ? liftAt(px, py, t) : 0, tint); });
+  }
+}
+// --- the dress-up view ---
+const PREVIEW_ROWS = { echo: ['O.....O', 'OOOWOOO', 'OEOWOEO', 'OOWPWOO', '.WWWWW.', '.oWWWo.', '.OWWWO.', '.WW.WW.'], yoko: ['F.....F', 'FFfFfFF', 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'] };
+let dressWho = 'echo', dressTry = null;
+const cssRgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+function gearIcon(g) {                                      // a tiny pixel picture of the item, for its button
+  const xs = g.cells.map(c => c[0]), ys = g.cells.map(c => c[1]), x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0 + 1, h = Math.max(...ys) - y0 + 1;
+  const rects = g.cells.map(([x, y, k]) => `<rect x="${x - x0}" y="${y - y0}" width="1.02" height="1.02" fill="${cssRgb(g.pal[k])}"/>`).join('');
+  return `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 ${w + 2} ${h + 2}" shape-rendering="crispEdges">${rects}</svg>`)}')`;
+}
+function previewWorn() { const w = { ...dress.worn[dressWho] }; if (dressTry) w[gearById(dressTry).slot] = dressTry; return w; }
+function drawDressPreview() {
+  const cv = $('dressCanvas'), g = cv.getContext('2d'), u = 28, pal = dressWho === 'echo' ? BOT_PAL : YOKO_PAL, oy = 3 * u;
+  g.clearRect(0, 0, cv.width, cv.height);
+  const cell = (x, y, c) => { g.fillStyle = `rgb(${c[0] * .6 | 0},${c[1] * .6 | 0},${c[2] * .6 | 0})`; g.fillRect(x * u, y * u, u, u); g.fillStyle = cssRgb(c); g.fillRect(x * u, y * u, u - 2, u - 3); };
+  PREVIEW_ROWS[dressWho].forEach((row, r) => [...row].forEach((ch, k) => {
+    if (ch === '.') return;
+    cell(k, r + 3, pal[ch]);
+    if (ch === 'E') { g.fillStyle = '#2a1d14'; g.fillRect(k * u + 9, (r + 3) * u + 6, 8, 14); g.fillStyle = '#fff'; g.fillRect(k * u + 9, (r + 3) * u + 6, 3, 3); }
+  }));
+  for (const id of Object.values(previewWorn())) { const it = gearById(id); it.cells.forEach(([x, y, k]) => cell(x, y + 3, it.pal[k])); }
+}
+function renderDress() {
+  const have = S.treats || 0;
+  $('dressTreats').textContent = `${have} treat${have === 1 ? '' : 's'}`;
+  $('dressWho').querySelectorAll('[data-who]').forEach(b => b.setAttribute('aria-pressed', b.dataset.who === dressWho));
+  const worn = dress.worn[dressWho], name = CAT_NAMES[dressWho], it = dressTry && gearById(dressTry);
+  const bar = $('dressBar');
+  if (!it) bar.innerHTML = `<span>Tap an item to try it on ${name}.</span>${Object.keys(worn).length ? '<button class="btn" data-act="clear">Take everything off</button>' : ''}`;
+  else if (!dress.owned.includes(it.id)) bar.innerHTML = have >= it.cost
+    ? `<button class="btn primary" data-act="buy">Buy ${esc(it.name)} for ${it.cost} treats</button>`
+    : `<span>${esc(it.name)} costs ${it.cost} treats. You need ${it.cost - have} more.</span>`;
+  else bar.innerHTML = worn[it.slot] === it.id ? `<button class="btn" data-act="off">Take off ${esc(it.name)}</button>` : `<button class="btn primary" data-act="wear">Put ${esc(it.name)} on ${name}</button>`;
+  $('dressShop').innerHTML = GEAR_SLOTS.map(([slot, label]) => `<div class="dress-slot"><h3>${label}</h3><div class="dress-grid">${GEAR.filter(g => g.slot === slot).map(g => {
+    const owned = dress.owned.includes(g.id), on = worn[slot] === g.id;
+    return `<button class="gear${g.id === dressTry ? ' sel' : ''}${on ? ' on' : ''}" data-gear="${g.id}" aria-pressed="${g.id === dressTry}"><i style="background-image:${gearIcon(g)}"></i>${esc(g.name)}<small>${on ? 'wearing' : owned ? 'owned' : g.cost + ' treats'}</small></button>`; }).join('')}</div></div>`).join('');
+  drawDressPreview();
+}
+$('dressWho').onclick = e => { const b = e.target.closest('[data-who]'); if (!b) return; dressWho = b.dataset.who; dressTry = null; renderDress(); };
+$('dressShop').onclick = e => { const b = e.target.closest('[data-gear]'); if (!b) return; dressTry = dressTry === b.dataset.gear ? null : b.dataset.gear; renderDress(); };
+$('dressBar').onclick = e => {
+  const act = e.target.closest('[data-act]')?.dataset.act, it = dressTry && gearById(dressTry), worn = dress.worn[dressWho];
+  if (act === 'clear') dress.worn[dressWho] = {};
+  else if (it && act === 'off') delete worn[it.slot];
+  else if (it && act === 'wear') worn[it.slot] = it.id;
+  else if (it && act === 'buy') {
+    if ((S.treats || 0) < it.cost || dress.owned.includes(it.id)) return;
+    S.treats -= it.cost; store.set('cardstock-state', S); dress.owned.push(it.id); worn[it.slot] = it.id;
+    toast(`${CAT_NAMES[dressWho]} is wearing the ${it.name}`); Sound.play('craft'); renderCollect();
+  } else return;
+  saveDress(); dressTry = null; renderDress();
+};
+$('dressBtn').onclick = $('dressBtn2').onclick = () => { location.hash = '#dress'; };
+$('dressBack').onclick = () => { location.hash = ''; };
+
 /* ================= views ================= */
 function route() {
-  const binder = location.hash === '#binder';
-  $('profileView').hidden = binder; $('binderView').hidden = !binder;
+  const binder = location.hash === '#binder', dressing = location.hash === '#dress';
+  $('profileView').hidden = binder || dressing; $('binderView').hidden = !binder; $('dressView').hidden = !dressing;
   if (binder) renderBinder();
+  if (dressing) { dressTry = null; renderDress(); }
   scrollTo(0, 0);
 }
 addEventListener('hashchange', route);
@@ -1727,7 +1824,7 @@ function renderToggles() {
   $('peekBtn').textContent = peek ? 'Show card' : 'Hide card'; $('peekBtn').setAttribute('aria-pressed', peek);
 }
 $('soundBtn').onclick = $('stageSound').onclick = () => { Sound.on = !Sound.on; store.set('cardstock-sound', Sound.on); renderToggles(); Sound.play('on'); };
-$('peekBtn').onclick = () => { $('profileView').classList.toggle('peek'); renderToggles(); };
+$('peekBtn').onclick = () => { const on = !$('profileView').classList.contains('peek'); ['profileView', 'binderView', 'dressView'].forEach(id => $(id).classList.toggle('peek', on)); renderToggles(); };
 renderToggles();
 let ambientN = 0; setInterval(() => Sound.ambient(phaseKey, ambientN++), 600);
 

@@ -61,3 +61,6 @@ Six real photos of Echo and Yoko together (`sib1.jpg` to `sib6.jpg`), all legend
 
 ## More cats
 The Cat pack has 20 extra pixel cats (`c-` ids, built with `newCat` in app.js): 8 common, 6 uncommon, 4 rare, 2 legendary. It now holds 41 cards.
+
+## Dress up
+`#dress` is a tab where treats buy things for Echo and Yoko to wear (`GEAR` in app.js: 7 hats, 5 neckwear, 5 face items). Ownership and what each cat wears are saved in localStorage (`cardstock-dress`), and `drawGear` paints them onto the cats in the scene.
