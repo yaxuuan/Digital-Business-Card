@@ -5,7 +5,7 @@ const CONFIG = {
   title: 'Marketing Student',
   org: '',
   bio: 'Marketing student based in Singapore. Save my contact, then open a pack to meet my cats.',
-  photo: '',                                   // blank shows initials
+  photo: 'photo.jpg',                          // blank shows initials
   background: '',                              // e.g. 'bg.jpg' turns that photo into the pixel background; blank shows the time-of-day scenes
   timeZone: 'Asia/Singapore', place: 'Singapore',   // the sky follows the owner's local time
   email: 'luayaxuan@gmail.com',
@@ -84,6 +84,11 @@ const CARDS = [
   { id:'duo', star:'Yoko & Echo', name:'Double Trouble', rarity:'legendary', glyph:'', ink:'#3a2200', flavour:'Yoko knocks it off the table. Echo watches.',
     art: pixelArt(['F.....F.O.....O', 'FFFFFFF.OOOWOOO', 'FAFFFAF.OEOWOEO', 'FFFPFFF.OOWPWOO', '.FyyyF...WWWWW.', '.FFFFF...OWWWO.', 'FFFFFFF.OOWWWOO', 'FFFFFFF.OOWWWOO'],
                   { ...BP, F:'#c19a6b', A:'#7a4a10', y:'#f8dcae' }, 'radial-gradient(circle at 50% 45%,#fffbe8 0 34%,#f2c14e 60%,#6a3a12 100%)') },
+  // The real cats: photo cards. Legendary, like the rest of Yoko and Echo's cards.
+  { id:'echo-photo', star:'Echo', name:'Echo', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Echo, caught mid-stare.',
+    art: "url('echo.jpg') 50% 38% / cover no-repeat" },
+  { id:'yoko-photo', star:'Yoko', name:'Yoko', rarity:'legendary', glyph:'', ink:'#ffffff', flavour:'The real Yoko, fluffy and unbothered.',
+    art: "url('yoko.jpg') 50% 32% / cover no-repeat" },
   // More memes, with other cats.
   { id:'buffer', name:'Buffering', rarity:'common', glyph:'', ink:'#3a2410', flavour:'Staring at the wall. Loading. Please wait.',
     art: pixelArt(['..............', '....o.o.o.....', '..............', '...G......G...', '...GG....GG...', '...GGGGGGGG...', '..GGGGGGGGGG..', '..GGGGGGGGGG..',

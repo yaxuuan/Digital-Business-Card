@@ -405,7 +405,7 @@ details.odds summary:hover { color:var(--fg); border-color:#e0508f; }
 
 /* packs and card backs: pink Marketing pack, lavender Cat pack */
 .pack, .pk-mini { --p1:#ffb3d4; --p2:#ff6fa8; --p3:#8a1f5a; }
-.pack.set-cats, .pk-mini.set-cats { --p1:#d9c6ff; --p2:#9a6bff; --p3:#40208a; }
+.pack.set-cats, .pk-mini.set-cats { --p1:#e6cfa6; --p2:#b08455; --p3:#5a3a18; }
 .pack.lucky { --p1:#fff0b0; --p2:#e0a21b; --p3:#7a4f06; }
 .pk-mini { color:#fff; }
 .pk-mini.on { box-shadow:0 0 0 2px #e0508f; }
