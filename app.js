@@ -416,7 +416,7 @@ function renderOdds() {
   cards.forEach(c => { tierPct[c.rarity] = (tierPct[c.rarity] || 0) + odds[c.id]; tierN[c.rarity] = (tierN[c.rarity] || 0) + 1; });
   $('oddsTable').innerHTML = Object.keys(TIERS).filter(t => tierN[t]).map(t =>
     `<tr><td><span class="r-${t}" style="color:var(--rc)">${TIERS[t].sym}</span> ${TIERS[t].label} <span style="color:var(--muted)">(${tierN[t]} card${tierN[t] > 1 ? 's' : ''})</span></td><td>${(tierPct[t] * 100).toFixed(1)}%</td></tr>`).join('') +
-    `<tr><td colspan="2" style="color:var(--muted);border:0">You hold up to ${PACK_MAX} packs and one refills every hour. After 3 duplicates in a row, the next card is one you don't have. ${PACK_SIZE} cards per pack. Duplicates turn into treats, which you can spend in the binder on a card you are missing. Catch ${CATS_PER_LUCKY} cats to earn a lucky pack, which has no Commons. Any card has a 1 in 100 chance of being a shiny holo copy.</td></tr>`;
+    `<tr><td colspan="2" style="color:var(--muted);border:0">You hold up to ${PACK_MAX} packs and one refills every hour. After 3 duplicates in a row, the next card is one you don't have. ${PACK_SIZE} cards per pack. Duplicates turn into treats, which you can spend in the binder on a card you are missing. Catch ${CATS_PER_LUCKY} snacks to earn a lucky pack, which has no Commons. Any card has a 1 in 100 chance of being a shiny holo copy.</td></tr>`;
 }
 
 function fmtWait(ms) { const m = Math.ceil(ms / 60000), h = Math.floor(m / 60); return h ? `${h}h ${m % 60}m` : `${m}m`; }
@@ -431,7 +431,7 @@ function renderCollect() {
   renderOdds();
   const toLucky = CATS_PER_LUCKY - score % CATS_PER_LUCKY;
   $('packStatus').textContent = (bonus ? `${bonus} lucky pack${bonus > 1 ? 's' : ''} ready: no Commons inside.`
-    : `${left.n} of ${PACK_MAX} packs left${left.n < PACK_MAX ? `, next in ${fmtWait(left.nextIn)}` : ''}. Catch ${toLucky} more cat${toLucky > 1 ? 's' : ''} for a lucky pack.`)
+    : `${left.n} of ${PACK_MAX} packs left${left.n < PACK_MAX ? `, next in ${fmtWait(left.nextIn)}` : ''}. Catch ${toLucky} more snack${toLucky > 1 ? 's' : ''} for a lucky pack.`)
     + (treats ? ` ${treats} treat${treats > 1 ? 's' : ''} to spend in the binder.` : '');
   $('binderCount').textContent = `${owned.size}/${CARDS.length}`;
   $('strip').style.gridTemplateColumns = `repeat(${CARDS.length > 10 ? Math.ceil(CARDS.length / 2) : CARDS.length}, minmax(0,1fr))`;
@@ -1249,7 +1249,7 @@ function drawGround(t, P, still) {
 function drawFigures(t, P) {                                // tree or lamp, and the cat: small, and they animate
   const tint = P.stars ? [.8, .8, .95] : P.back === 'bay' ? [1.08, .82, .96] : ONE;
   drawProp(t, P, tint);
-  const hop = t - hopT < 380 ? Math.sin((t - hopT) / 380 * Math.PI) * cs * 1.3 : 0;   // a little jump when a cat is caught
+  const hop = t - hopT < 380 ? Math.sin((t - hopT) / 380 * Math.PI) * cs * 1.3 : 0;   // a little jump when a snack is caught
   const rows = botRows(t), bx = botC * cs, by = groundTop(botC) - rows.length * cs - hop;
   if (catAsleep(t)) {                                       // floating z's
     ctx.font = `700 ${Math.round(cs * 1.2)}px ui-monospace, Menlo, monospace`;
@@ -1310,25 +1310,22 @@ function drawPetals(t, dt, P) {
   }
 }
 
-// The falling cat to catch: a pixel portrait of the owner's cat (cream-orange, white blaze and muzzle, sleepy eyes, crossed paws).
-const CAT = [
-  '.O...........O.', '.OO.........OO.', '.OpO.......OpO.', '.OppOOOOOOOppO.', 'OOOOOoOWOoOOOOO', 'OOOOoOWWWoOOOOO', 'OOLLLOWWWOLLLOO',
-  'OOEKEOWWWOEKEOO', 'OOOOOWWWWWOOOOO', '.OOOWWWPWWWOOO.', '.OOWWWWWWWWWOO.', '..WWWWWWWWWWW..', '...WWWWWWWWW...', '....WWW.WWW....',
+// The falling snacks to catch: pixel fish and a chicken drumstick. Each has a golden version for the bonus drop (+5).
+const FISH = ['................', '.......bb.......', '.....BBBBBB..F..', '...BBBBBBBBB.FF.', '..BBKBBBBBBBBFFF', '..BBBBBBBBBBBFF.', '...WWWWWWWWW.FF.', '.....WWWWWW..F..', '................'];
+const DRUM = ['..............', '.......MMMM...', '.....MMMMMMMM.', '....MMhhMMMMMm', '....MhhMMMMMMm', '....MMMMMMMMMm', '.....MMMMMMMm.', '......MMMMmm..', '.....EEmm.....', '....EEe.......', '...EEe........', '..EEe.........', '.EEeEE........', '..............'];
+const GOLD_FISH = { B: '#f2c14e', b: '#d49a2a', W: '#fff4cc', F: '#e0a21b', K: '#7a4f06' };
+const SNACKS = [
+  { grid: FISH, pal: { B: '#6fa8dc', b: '#3d6f9e', W: '#e8f2fb', F: '#4a82b8', K: '#1d2540' }, goldPal: GOLD_FISH },               // blue fish
+  { grid: FISH, pal: { B: '#ff9a7a', b: '#d9593a', W: '#ffe3d6', F: '#e8745a', K: '#4a1f14' }, goldPal: GOLD_FISH },               // salmon
+  { grid: DRUM, pal: { M: '#d9822b', m: '#a85a1a', h: '#f4b45a', E: '#fbf3e0', e: '#d8cdb0' },
+    goldPal: { M: '#f2c14e', m: '#d49a2a', h: '#fff0a0', E: '#fff4cc', e: '#e8d9a0' } },                                          // chicken drumstick
 ];
-const CAT_PAL = { O: '#c19a6b', o: '#9a7549', W: '#fbf3ea', L: '#8a6238', E: '#a89a4c', K: '#3a2a1e', P: '#d8907a', p: '#f0b0a0' };
-const GOLD_PAL = { ...CAT_PAL, O: '#f2c14e', o: '#d49a2a', W: '#fff4cc', L: '#b07a1a', E: '#fff0a0' };
-const YOKO = [
-  '.F...........F.', '.FF.........FF.', '.FpF.......FpF.', '.FppFFFFFFFppF.', 'FFFFsFFsFFsFFFF', 'FFFFFFFFFFFFFFF', 'FFAAAFFFFFAAAFF',
-  'FFAKAFFFFFAKAFF', 'FFFFFFFFFFFFFFF', '.FFFFyyPyyFFFF.', '.FFFyyyyyyyFFF.', '..FFFyyyyyFFF..', '...FFFFFFFFF...', '....FFF.FFF....',
-];
-const YOKO_SPR = { F: '#c19a6b', s: '#9a7549', A: '#e8a41c', K: '#2a1d14', P: '#e58f8f', p: '#f4b6a6', y: '#f8dcae' };
-const YOKO_GOLD = { ...YOKO_SPR, F: '#f2c14e', s: '#d49a2a', y: '#fff4cc', A: '#fff0a0' };
-function catSprite(gold, yoko = false) {                                  // drawn once per pixel size, then copied
-  const s = Math.max(2, Math.round(packSize() / 9)), key = `cat-${gold}-${yoko}-${s}`, grid = yoko ? YOKO : CAT;
+function snackSprite(gold, kind = 0) {                                    // drawn once per pixel size, then copied
+  const s = Math.max(2, Math.round(packSize() / 9)), k = SNACKS[kind] ? kind : 0, key = `snack-${gold}-${k}-${s}`, { grid, pal, goldPal } = SNACKS[k];
   return cache[key] ||= (() => {
-    const c = document.createElement('canvas'), x = c.getContext('2d'), pal = yoko ? (gold ? YOKO_GOLD : YOKO_SPR) : gold ? GOLD_PAL : CAT_PAL;
+    const c = document.createElement('canvas'), x = c.getContext('2d'), colours = gold ? goldPal : pal;
     c.width = grid[0].length * s; c.height = grid.length * s;
-    grid.forEach((row, r) => [...row].forEach((ch, k) => { if (pal[ch]) { x.fillStyle = pal[ch]; x.fillRect(k * s, r * s, s, s); } }));
+    grid.forEach((row, r) => [...row].forEach((ch, i) => { if (colours[ch]) { x.fillStyle = colours[ch]; x.fillRect(i * s, r * s, s, s); } }));
     return c;
   })();
 }
@@ -1472,7 +1469,7 @@ function packSize() { return Math.max(18, cs * 2.2); }
 function drawPacks(t, dt) {
   packs = packs.filter(p => p.y < H + 60);
   for (const p of packs) {
-    const img = catSprite(p.gold, p.yoko), w = img.width, h = img.height;
+    const img = snackSprite(p.gold, p.kind), w = img.width, h = img.height;
     p.y += p.vy * dt / 1000; p.rot += p.vr * dt / 1000;
     p.sx = p.x + Math.sin(t * .0012 + p.sway) * 14;
     ctx.save(); ctx.translate(p.sx, p.y); ctx.rotate(Math.sin(t * .002 + p.sway) * .28);   // a gentle rock as it floats down
@@ -1535,18 +1532,18 @@ function spawnPack(t) {
   if (reduced() || t < nextPack || packs.length >= 5) return;
   const pr = $('panel').getBoundingClientRect(), side = !mobile() && !$('profileView').hidden;
   const minX = side ? pr.right + 30 : 24, maxX = W - 24;
-  if (maxX - minX > 40) packs.push({ x: minX + Math.random() * (maxX - minX), y: -40, vy: H / (8 + Math.random() * 4), sway: Math.random() * 6, rot: (Math.random() - .5) * .6, vr: (Math.random() - .5) * .8, gold: Math.random() < .06, yoko: Math.random() < .5 });
+  if (maxX - minX > 40) packs.push({ x: minX + Math.random() * (maxX - minX), y: -40, vy: H / (8 + Math.random() * 4), sway: Math.random() * 6, rot: (Math.random() - .5) * .6, vr: (Math.random() - .5) * .8, gold: Math.random() < .06, kind: Math.floor(Math.random() * SNACKS.length) });
   nextPack = t + 1400 + Math.random() * 2200;
 }
 function renderScore(bump) {
   const el = $('score'); el.hidden = !score && !eggs.length;
-  el.innerHTML = `<b>${score}</b> cat${score === 1 ? '' : 's'} caught` + (eggs.length ? ` · ✦ <b>${eggs.length}</b>/${Object.keys(SECRETS).length}` : '');
+  el.innerHTML = `<b>${score}</b> snack${score === 1 ? '' : 's'} caught` + (eggs.length ? ` · ✦ <b>${eggs.length}</b>/${Object.keys(SECRETS).length}` : '');
   if (bump) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
 }
 
 const MILESTONES = { 10: '10 caught. Echo is wide awake.',25: '25 caught. Echo put on a visor.', 50: '50 caught. Echo is glowing gold.' };
 function catchPack(x, y, finger) {
-  const reach = catSprite(false).width * .6 + (finger ? 14 : 4);
+  const reach = snackSprite(false, 0).width * .6 + (finger ? 14 : 4);
   const p = packs.find(q => Math.hypot(x - q.sx, y - q.y) < reach);
   if (!p) return false;
   packs.splice(packs.indexOf(p), 1);
@@ -1560,8 +1557,8 @@ function catchPack(x, y, finger) {
   if (navigator.vibrate) navigator.vibrate(15);
   renderScore(true);
   const hit = Object.keys(MILESTONES).map(Number).filter(m => before < m && score >= m).pop();
-  if (earned > 0) toast((hit ? MILESTONES[hit] + ' ' : `${score} cats caught. `) + 'You earned a lucky pack.');
-  else if (hit) toast(MILESTONES[hit]); else if (p.gold) toast('Golden cat: +5');
+  if (earned > 0) toast((hit ? MILESTONES[hit] + ' ' : `${score} snacks caught. `) + 'You earned a lucky pack.');
+  else if (hit) toast(MILESTONES[hit]); else if (p.gold) toast('Golden snack: +5');
   return true;
 }
 addEventListener('pointermove', e => {

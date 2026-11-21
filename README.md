@@ -1,6 +1,6 @@
 # Cardstock
 
-A gamified digital business card in one file, `index.html`. Visitors open it from an NFC tap or a QR code, see your contact links, catch falling pixel cats, and rip open a pack to collect one of your cards.
+A gamified digital business card in one file, `index.html`. Visitors open it from an NFC tap or a QR code, see your contact links, catch falling pixel snacks (fish and chicken), and rip open a pack to collect one of your cards.
 
 ## Files
 
@@ -42,7 +42,7 @@ Eleven things in the scenes react to a tap, and a counter beside the cat score t
 
 ## Known limits
 
-- Packs: a visitor holds 3, one refills every hour, and every 10 cats caught earns a lucky pack with no Commons. Each pack has 3 cards. Duplicates turn into treats, which buy a chosen missing card in the binder. Finishing a pack's set earns a lucky pack and a mascot outfit. The numbers are `PACK_MAX`, `PACK_REFILL_MS`, `CATS_PER_LUCKY`, `PACK_SIZE`, `TREATS` and `CRAFT_COST` in `rules.js`.
+- Packs: a visitor holds 3, one refills every hour, and every 10 snacks caught earns a lucky pack with no Commons. Each pack has 3 cards. Duplicates turn into treats, which buy a chosen missing card in the binder. Finishing a pack's set earns a lucky pack and a mascot outfit. The numbers are `PACK_MAX`, `PACK_REFILL_MS`, `CATS_PER_LUCKY`, `PACK_SIZE`, `TREATS` and `CRAFT_COST` in `rules.js`.
 - "Send me your details" opens the visitor's own mail app with a message filled in. Nothing is stored or sent by the page.
 - Share image: none ships with the template. Screenshot your finished card as `og.jpg` (1200x630) and add the `og:image` tags described at the top of `index.html`.
 - Pack rolls and the catch score are stored in the visitor's browser only. Lines marked `shortcut:` show what moves to a server before real use.
