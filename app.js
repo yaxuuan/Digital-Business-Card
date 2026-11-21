@@ -832,7 +832,7 @@ function resize() {
   cs = mobile() ? Math.max(7, Math.floor(W / 40)) : Math.max(9, Math.round(Math.min(W / 110, H / 58)));
   cols = Math.ceil(W / cs) + 1;
   const base = baseRows = mobile() ? 5 : 6;
-  botC = Math.floor(cols * (mobile() ? .58 : .7)); treeC = Math.floor(cols * (mobile() ? .2 : .88));
+  botC = Math.floor(cols * (mobile() ? .52 : .7)); treeC = Math.floor(cols * (mobile() ? .14 : .86));
   // Each scene has its own ground shape: rolling meadow, flat station platform, jagged shore rocks, flat rooftop.
   const shapes = {
     morning: c => Math.max(3, Math.round(base + 2 * Math.sin(c * .19 + 1) + 1.3 * Math.sin(c * .071 + 2.3))),
@@ -1208,36 +1208,38 @@ function drawProp(t, P, tint) {
   }
 }
 
-// Mini me: a pixel portrait of the owner resting on a bench at the right-hand side of the scene. Her eyes are closed and open when the pointer comes close; at night a few z's float up.
-const ME_PAL = { H: [100, 62, 46], h: [146, 98, 70], S: [246, 214, 190], c: [176, 120, 100], k: [40, 28, 28], m: [214, 120, 120], K: [74, 72, 96], P: [66, 64, 88], Z: [238, 238, 244],
-                 W: [176, 128, 84], w: [138, 96, 58], L: [84, 64, 50] };
-const ME_ROWS = ['.hHh.', 'HHHHH', 'HcScH', 'HSmSH', 'HKSKH', 'HKKKH', 'PPPPP', 'PP.PP', 'ZZ.ZZ'];
-function benchLayout() {                                    // where the bench goes: against the right edge, clear of the lamp or tree and of Echo's tail
-  const vis = cols - 1;
-  let bw = mobile() ? 7 : 9, c = Math.max(treeC + 3, vis - bw - 1);                  // one column of margin from the edge
-  if (c + bw > vis - 1) { bw = 7; c = Math.max(treeC + 3, vis - bw - 1); }
-  return { bw, c };
+// Mini me: a pixel portrait of the owner resting on a bench at the right-hand side of the scene, a little cat curled up beside her.
+// Her eyes are closed and open when the pointer comes close; at night a few z's float up.
+const ME_PAL = { H: [52, 28, 2], h: [96, 60, 30], S: [246, 214, 190], c: [176, 120, 100], k: [40, 28, 28], m: [214, 120, 120], E: [214, 218, 230],
+                 J: [200, 172, 238], j: [178, 148, 222], G: [122, 126, 146], Z: [238, 238, 244],
+                 W: [176, 128, 84], w: [138, 96, 58], L: [84, 64, 50], C: [193, 154, 107], d: [154, 117, 73], X: [251, 243, 234] };
+const ME_ROWS = ['.hHh.', 'HHHHH', 'HcScH', 'ESmSE', 'HJSJH', 'HJjJH', 'HGGGH', 'GG.GG', 'ZZ.ZZ'];   // long hair, small earrings, lilac hoodie, joggers, sneakers
+const CAT_ROWS = ['C.C', 'CCC', 'dXd'];                                                                // a tiny cat, curled up
+function benchLayout() {                                    // against the right edge, with one column of margin
+  const bw = 9;
+  return { bw, c: cols - 1 - bw - 1 };
 }
 function drawBench(t, tint) {
   const { bw, c } = benchLayout();
-  if (c < botC + 9) return;                                // no room beside the cats on a very narrow screen
-  const ox = (bw - 5) >> 1, top = groundTop(c + (bw >> 1)) - 9 * cs;
+  if (c < botC + 9 || c < treeC + 3) return;                // no room beside the cats and the lamp or tree on a very narrow screen
+  const ox = 1, top = groundTop(c + (bw >> 1)) - 9 * cs;
   const near = Math.hypot(mX - (c + bw / 2) * cs, mY - (top + 4 * cs)) < cs * 14;
   const me = ME_ROWS.map((row, i) => i === 2 && near ? 'HkSkH' : row);
   for (let r = 0; r < 9; r++) for (let k = 0; k < bw; k++) {
     let ch = '.';
-    if (r >= 3 && r <= 5 && (k < ox || k >= bw - ox)) ch = (k + r) % 2 ? 'W' : 'w';   // the backrest, either side of her
+    if (r >= 3 && r <= 5 && (k === 0 || k === bw - 1)) ch = (k + r) % 2 ? 'W' : 'w';   // backrest, at both ends
     if (r === 6) ch = 'W';                                                            // seat
     if (r === 7) ch = 'w';
     if (r === 8 && (k === 0 || k === bw - 1)) ch = 'L';                               // bench legs
     const f = k - ox; if (f >= 0 && f < 5 && me[r][f] !== '.') ch = me[r][f];
+    const q = k - (bw - 3), cr = r - 3; if (q >= 0 && cr >= 0 && cr < 3 && CAT_ROWS[cr][q] !== '.') ch = CAT_ROWS[cr][q];   // the cat, on the seat beside her
     if (ch === '.') continue;
     const x = (c + k) * cs, y = top + r * cs;
     block(x, y, ME_PAL[ch], liftAt(x, y, t), tint);
   }
   if (phaseKey === 'night' && !near) {
     ctx.font = `700 ${Math.round(cs * 1.2)}px ui-monospace, Menlo, monospace`;
-    for (let i = 0; i < 2; i++) { const q = (t / 2600 + i * .5) % 1; ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - q)})`; ctx.fillText('z', (c + ox + 5) * cs + q * cs * 2, top - q * cs * 3); }
+    for (let i = 0; i < 2; i++) { const q = (t / 2600 + i * .5) % 1; ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - q)})`; ctx.fillText('z', (c + bw - 2) * cs + q * cs * 2, top + 2 * cs - q * cs * 3); }
   }
 }
 

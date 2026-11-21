@@ -39,7 +39,7 @@ Open `index.html` in a browser, or put the file on any static host (Cloudflare P
 ## The scene
 
 - **Snacks:** the things that fall are drawn in `SNACKS` in `app.js` (fish, chicken, shrimp, fish bone, tuna can, cat biscuit). Each has a golden version for the +5 bonus. Add a pixel grid and a colour palette to add another kind.
-- **Mini me:** the figure resting on the bench at the right-hand side is `ME_ROWS` and `ME_PAL` in `app.js`. Change the letters or colours to change her hair, outfit or skin tone. She opens her eyes when the pointer gets close.
+- **Mini me:** the figure resting on the bench at the right-hand side is `ME_ROWS` and `ME_PAL` in `app.js`, and the little cat curled up beside her is `CAT_ROWS`. Change the letters or colours to change her hair, outfit or skin tone. She opens her eyes when the pointer gets close.
 
 ## Hidden secrets
 
