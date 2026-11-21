@@ -1640,64 +1640,6 @@ function frame(t) {
   drawSky(t, P); drawLand(t, P); drawPetals(t, dt, P); drawTapFx(t, dt); drawSecrets(t); drawPacks(t, dt); drawEffects(t); drawFireworks(t);
 }
 requestAnimationFrame(frame);
-/* ================= save progress: move packs, treats and cards to another device ================= */
-// shortcut: there is no server, so progress lives in each browser. This packs it into a link or code that another device can load.
-const bytesToB64 = u8 => { let bin = ''; u8.forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
-const b64ToBytes = t => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/')), ch => ch.charCodeAt(0));
-const streamBytes = async (u8, T) => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new T('deflate-raw'))).arrayBuffer());
-async function packProgress() {
-  const flags = p => (p.isNew ? 1 : 0) | (p.first ? 2 : 0) | (p.lucky ? 4 : 0) | (p.shiny ? 8 : 0) | (p.crafted ? 16 : 0);
-  const data = { v: 1, s: { ...S, pulls: S.pulls.map(p => [p.id, p.serial, p.t, flags(p), p.treats || 0]) }, n: score, e: eggs, k: packSet };
-  const raw = new TextEncoder().encode(JSON.stringify(data));
-  if (typeof CompressionStream === 'function') { try { return 'z.' + bytesToB64(await streamBytes(raw, CompressionStream)); } catch (e) { /* fall back to plain */ } }
-  return 'j.' + bytesToB64(raw);
-}
-// Reads a save link or code and rebuilds a clean state from it. Anything unexpected is dropped, so a bad code cannot break the game.
-async function unpackProgress(text) {
-  const t = String(text).trim().replace(/^.*#progress=/, '');
-  if (!/^[zj]\.[A-Za-z0-9_-]{8,}$/.test(t) || t.length > 600000) throw new Error('not a save code');
-  let raw = b64ToBytes(t.slice(2));
-  if (t[0] === 'z') raw = await streamBytes(raw, DecompressionStream);
-  const d = JSON.parse(new TextDecoder().decode(raw));
-  if (!d || d.v !== 1 || !d.s || !Array.isArray(d.s.pulls)) throw new Error('not a save code');
-  const int = (v, max = 1e6) => Number.isInteger(v) && v >= 0 && v <= max ? v : 0;
-  const ids = new Set(CARDS.map(c => c.id));
-  const state = {
-    pulls: d.s.pulls.slice(0, 5000).filter(r => Array.isArray(r) && ids.has(r[0])).map(r => { const f = Number(r[3]) | 0;
-      return { id: r[0], serial: Math.max(1, int(r[1])), t: Number(r[2]) || 0, isNew: !!(f & 1), first: !!(f & 2), lucky: !!(f & 4), shiny: !!(f & 8), treats: int(r[4], 100), ...(f & 16 ? { crafted: true } : {}) }; }),
-    serials: Object.fromEntries(Object.entries(d.s.serials || {}).filter(([k]) => ids.has(k)).map(([k, v]) => [k, int(v)])),
-    dupStreak: int(d.s.dupStreak, 1000), treats: int(d.s.treats), bonus: int(d.s.bonus, 1000),
-    done: Array.isArray(d.s.done) ? d.s.done.filter(k => SETS[k]) : [],
-  };
-  if (d.s.charge && typeof d.s.charge === 'object') state.charge = { n: int(d.s.charge.n, 100), t: Number(d.s.charge.t) || Date.now() };
-  return { state, score: int(d.n), eggs: Array.isArray(d.e) ? d.e.filter(k => SECRETS[k]) : [], packSet: SETS[d.k] ? d.k : 'cats' };
-}
-const progressLine = (state, caught) => `${new Set(state.pulls.map(p => p.id)).size} of ${CARDS.length} cards · ${state.treats || 0} treats · ${caught} snacks caught`;
-function openProgress(prefill) {
-  $('progSummary').textContent = `This device: ${progressLine(S, score)}.`;
-  $('progCode').value = prefill || '';
-  openModal('progressModal');
-}
-async function copyText(text, done) {
-  try { await navigator.clipboard.writeText(text); toast(done); }
-  catch (e) { $('progCode').value = text; $('progCode').select(); toast('Select the text and copy it'); }
-}
-$('progBtn').onclick = () => openProgress('');
-$('progCopyLink').onclick = async () => copyText(`${location.origin}${location.pathname}#progress=${await packProgress()}`, 'Link copied. Open it on your other device.');
-$('progCopyCode').onclick = async () => copyText(await packProgress(), 'Save code copied');
-$('progLoad').onclick = async () => {
-  let p; try { p = await unpackProgress($('progCode').value); } catch (e) { toast("That doesn't look like a save link or code"); return; }
-  if (!confirm(`Load this saved progress?\n\nSaved: ${progressLine(p.state, p.score)}\nThis device now: ${progressLine(S, score)}\n\nThis replaces the progress on this device.`)) return;
-  store.set('cardstock-state', p.state); store.set('cardstock-score', p.score); store.set('cardstock-eggs', p.eggs); store.set('cardstock-set', p.packSet);
-  history.replaceState(null, '', location.pathname + location.search);
-  location.reload();
-};
-if (location.hash.startsWith('#progress=')) {                // opened from a "Copy link" on another device: show it, and let the visitor decide
-  const code = location.hash.slice('#progress='.length);
-  history.replaceState(null, '', location.pathname + location.search);
-  openProgress(code); toast('Progress found in this link. Press Load to use it here.');
-}
-
 if (!store.get('cardstock-hint', false)) { $('intro').hidden = false; $('introOk').onclick = () => { $('intro').hidden = true; store.set('cardstock-hint', true); }; }
 $('moreBtn').onclick = () => { const open = $('panel').classList.toggle('open'); $('moreBtn').setAttribute('aria-expanded', open); $('moreBtn').textContent = open ? 'Show less' : 'More about me'; };
 
