@@ -50,6 +50,7 @@
         <span class="strip-cards" id="strip"></span>
       </a>
       <details class="odds"><summary>Pack odds</summary><table id="oddsTable"></table></details>
+      <button class="btn" id="progBtn">Save or move my progress</button>
     </div>
   </section>
 </main>
@@ -98,6 +99,25 @@
     <p class="url" id="craftText"></p>
     <div class="btns">
       <button class="btn primary" id="craftOk">Get this card</button>
+      <button class="btn" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="progressModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="progTitle">
+    <span class="label">Packs, treats and cards</span>
+    <h3 id="progTitle">Move my progress</h3>
+    <p class="note" id="progSummary"></p>
+    <p class="note">Your progress is saved in this browser only. To use it on another phone or computer, copy the link below, open it there, and press Load.</p>
+    <div class="btns">
+      <button class="btn primary" id="progCopyLink">Copy link for another device</button>
+      <button class="btn" id="progCopyCode">Copy save code instead</button>
+    </div>
+    <label class="prog-load" for="progCode">Got a link or code from another device? Paste it here
+      <textarea id="progCode" rows="3" spellcheck="false" autocomplete="off" placeholder="Paste a save link or code"></textarea></label>
+    <div class="btns">
+      <button class="btn" id="progLoad">Load it on this device</button>
       <button class="btn" data-close>Close</button>
     </div>
   </div>

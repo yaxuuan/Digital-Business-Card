@@ -55,3 +55,6 @@ Eleven things in the scenes react to a tap, and a counter beside the cat score t
 ## License
 
 MIT, see `LICENSE`.
+
+## Moving progress between devices
+Progress lives in each browser's localStorage, so a phone and a PC start separate. "Save or move my progress" (under More about me) packs the state into a link or code (`#progress=...`). Opening it on another device offers to load it, which replaces that device's progress. Input is validated on load: unknown cards are dropped and numbers are clamped. Real sync across devices would need a server and an account.

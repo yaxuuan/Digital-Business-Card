@@ -417,3 +417,9 @@ details.odds summary:hover { color:var(--fg); border-color:#e0508f; }
 }
 .cback span { background:#4a1f66; }
 .stage-wrap { background-image:radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--rc, #ff6fa8) 26%, transparent), transparent 60%); background-color:#2a1740; }
+
+/* save / move progress sheet */
+.sheet .note { margin:0; font-size:13px; color:var(--muted); text-align:left; }
+.prog-load { display:flex; flex-direction:column; gap:4px; text-align:left; font-size:13px; color:var(--muted); }
+.prog-load textarea { font:12px/1.4 var(--mono); color:var(--fg); padding:10px 12px; border-radius:14px; border:1px solid var(--glass-line); background:rgba(255,255,255,.7); width:100%; resize:vertical; word-break:break-all; }
+#progBtn { align-self:flex-start; }
