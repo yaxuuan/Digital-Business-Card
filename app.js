@@ -867,7 +867,6 @@ function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36, iris = BOT_PAL.E)
 function botRows(t) {
   const rows = ['O.....O', 'OOOWOOO', 'OEOWOEO', 'OOWPWOO', '.WWWWW.', '.oWWWo.', '.OWWWO.', '.WW.WW.'];
   if ((S.done || []).includes('dev')) rows[4] = '.BBBBB.';            // Dev pack complete: a scarf
-  if (score >= 10) rows[0] = 'OCCCCCO';                             // 10 caught: a cap between the ears
   if (score >= 25) rows[2] = 'OSSSSSO';                             // 25 caught: a visor
   else if (catAsleep(t)) rows[2] = 'OoOWOoO';                       // asleep at night until someone taps
   else if (t % 5200 < 160) rows[2] = 'OOOWOOO';                     // slow blink
@@ -1495,7 +1494,7 @@ function renderScore(bump) {
   if (bump) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
 }
 
-const MILESTONES = { 10: '10 caught. Echo found a cap.', 25: '25 caught. Echo put on a visor.', 50: '50 caught. Echo is glowing gold.' };
+const MILESTONES = { 10: '10 caught. Echo is wide awake.',25: '25 caught. Echo put on a visor.', 50: '50 caught. Echo is glowing gold.' };
 function catchPack(x, y, finger) {
   const reach = catSprite(false).width * .6 + (finger ? 14 : 4);
   const p = packs.find(q => Math.hypot(x - q.sx, y - q.y) < reach);
