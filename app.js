@@ -16,7 +16,7 @@ const CONFIG = {
   github: '',                         // username without @; blank hides the icon
   // Optional list of things you've built: { name, blurb, url }. Left empty, the Projects section is one link to your GitHub.
   projects: [],
-  url: '',                                   // the address on your NFC card and QR; blank = this page
+  url: 'https://yaxuuan.github.io/Digital-Business-Card/',   // the address on your NFC card and QR; blank = this page
 };
 // Palettes for the two cats in the meme cards: FP = the fluffy orange cat, BP = the orange-and-white cat.
 const FP = { F:'#eeb060', f:'#f6cf90', s:'#cf8a3c', A:'#e8a41c', K:'#2a1d14', P:'#e58f8f', p:'#f4b6a6', w:'#f8dcae', W:'#ffffff', R:'#d93a34', Y:'#f5c842', T:'#f08aa0', L:'#efe6d6', D:'#4a4f5c' };
