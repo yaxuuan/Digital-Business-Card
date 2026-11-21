@@ -2,6 +2,7 @@
 // Leave a field '' to hide its icon.
 const CONFIG = {
   name: 'Ya Xuan',
+  callName: 'Xuan',                       // what the cats and buttons call you
   title: 'Marketing Student',
   org: '',
   bio: 'Marketing student based in Singapore. Save my contact, then open a pack to meet my cats.',
@@ -389,7 +390,7 @@ function renderProfile() {
   $('stageLabel').textContent = `Series 1 · ${CONFIG.name}`;
   $('qrTitle').textContent = CONFIG.name;
   $('ownerName').textContent = CONFIG.name;
-  const firstName = CONFIG.name.split(' ')[0];
+  const firstName = CONFIG.callName;
   $('helloTitle').textContent = `Send ${firstName} your details`; $('helloBtn').textContent = `Send ${firstName} your details`;
   const projects = CONFIG.projects.length ? CONFIG.projects
     : CONFIG.github ? [{ name: 'See my projects on GitHub', blurb: 'github.com/' + CONFIG.github, url: 'https://github.com/' + CONFIG.github }] : [];
@@ -484,7 +485,7 @@ $('helloBtn').onclick = () => { openModal('helloModal'); $('helloName').focus();
 $('helloForm').addEventListener('submit', e => {            // opens the visitor's own mail app with the message filled in; nothing is sent from here
   e.preventDefault();
   const name = $('helloName').value.trim(), note = $('helloNote').value.trim(), reach = $('helloReach').value.trim();
-  const text = [`Hi ${CONFIG.name.split(' ')[0]}, this is ${name}.`, note && `We met: ${note}.`, reach && `You can reach me at ${reach}.`, '(Sent from your card)'].filter(Boolean).join(' ');
+  const text = [`Hi ${CONFIG.callName}, this is ${name}.`, note && `We met: ${note}.`, reach && `You can reach me at ${reach}.`, '(Sent from your card)'].filter(Boolean).join(' ');
   const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Hello from ' + name)}&body=${encodeURIComponent(text)}`;
   const a = document.createElement('a'); a.href = href; a.target = '_blank'; a.rel = 'noopener'; document.body.append(a); a.click(); a.remove();
   $('helloModal').hidden = true; toast('Opening your mail app. Press send there.');
@@ -1634,7 +1635,7 @@ addEventListener('pointerdown', e => {
   ripples.push({ x: e.clientX, y: e.clientY, t, big: true });
   if (!secretTap(e.clientX, e.clientY, t)) tapEffect(e.clientX, e.clientY, t);
   const bx = botC * cs, by = groundTop(botC) - 8 * cs;
-  if (e.clientX > bx && e.clientX < bx + 9 * cs && e.clientY > by && e.clientY < by + 8 * cs) { if (++petCount % 5 === 0) secret('goldrain', t); else { toast(`Mrrp. I'm Echo. I look after ${CONFIG.name.split(' ')[0]}'s cards.`); Sound.play('meow'); } }
+  if (e.clientX > bx && e.clientX < bx + 9 * cs && e.clientY > by && e.clientY < by + 8 * cs) { if (++petCount % 5 === 0) secret('goldrain', t); else { toast(`Mrrp. I'm Echo. I look after ${CONFIG.callName}'s cards.`); Sound.play('meow'); } }
   const yx = (botC - 10) * cs;
   if (e.clientX > yx - 2 * cs && e.clientX < yx + 7 * cs && e.clientY > by && e.clientY < by + 8 * cs) { toast('Yoko stares at you. Yoko says nothing.'); Sound.play('mrr'); }
 });
