@@ -832,7 +832,7 @@ function resize() {
   cs = mobile() ? Math.max(7, Math.floor(W / 40)) : Math.max(9, Math.round(Math.min(W / 110, H / 58)));
   cols = Math.ceil(W / cs) + 1;
   const base = baseRows = mobile() ? 5 : 6;
-  botC = Math.floor(cols * (mobile() ? .62 : .7)); treeC = Math.floor(cols * (mobile() ? .2 : .88));
+  botC = Math.floor(cols * (mobile() ? .58 : .7)); treeC = Math.floor(cols * (mobile() ? .2 : .88));
   // Each scene has its own ground shape: rolling meadow, flat station platform, jagged shore rocks, flat rooftop.
   const shapes = {
     morning: c => Math.max(3, Math.round(base + 2 * Math.sin(c * .19 + 1) + 1.3 * Math.sin(c * .071 + 2.3))),
@@ -845,6 +845,7 @@ function resize() {
     const hs = heightsBy[k] = Array.from({ length: cols }, (_, c) => shapes[k](c));
     for (let i = -13; i <= 9; i++) if (hs[botC + i] != null) hs[botC + i] = hs[botC];   // flat ground for the cats and their tails
     for (let i = -2; i <= 2; i++) if (hs[treeC + i] != null) hs[treeC + i] = hs[treeC];
+    { const bn = benchLayout(); for (let i = 0; i < bn.bw; i++) if (hs[bn.c + i] != null) hs[bn.c + i] = hs[bn.c + (bn.bw >> 1)]; }   // flat ground under the bench
   }
   heights = heightsBy[phaseKey];
   topRows = Math.max(...Object.values(heightsBy).flat());
@@ -1207,6 +1208,39 @@ function drawProp(t, P, tint) {
   }
 }
 
+// Mini me: a pixel portrait of the owner resting on a bench at the right-hand side of the scene. Her eyes are closed and open when the pointer comes close; at night a few z's float up.
+const ME_PAL = { H: [100, 62, 46], h: [146, 98, 70], S: [246, 214, 190], c: [176, 120, 100], k: [40, 28, 28], m: [214, 120, 120], K: [74, 72, 96], P: [66, 64, 88], Z: [238, 238, 244],
+                 W: [176, 128, 84], w: [138, 96, 58], L: [84, 64, 50] };
+const ME_ROWS = ['.hHh.', 'HHHHH', 'HcScH', 'HSmSH', 'HKSKH', 'HKKKH', 'PPPPP', 'PP.PP', 'ZZ.ZZ'];
+function benchLayout() {                                    // where the bench goes: against the right edge, clear of the lamp or tree and of Echo's tail
+  const vis = cols - 1;
+  let bw = mobile() ? 7 : 9, c = Math.max(treeC + 3, vis - bw - 1);                  // one column of margin from the edge
+  if (c + bw > vis - 1) { bw = 7; c = Math.max(treeC + 3, vis - bw - 1); }
+  return { bw, c };
+}
+function drawBench(t, tint) {
+  const { bw, c } = benchLayout();
+  if (c < botC + 9) return;                                // no room beside the cats on a very narrow screen
+  const ox = (bw - 5) >> 1, top = groundTop(c + (bw >> 1)) - 9 * cs;
+  const near = Math.hypot(mX - (c + bw / 2) * cs, mY - (top + 4 * cs)) < cs * 14;
+  const me = ME_ROWS.map((row, i) => i === 2 && near ? 'HkSkH' : row);
+  for (let r = 0; r < 9; r++) for (let k = 0; k < bw; k++) {
+    let ch = '.';
+    if (r >= 3 && r <= 5 && (k < ox || k >= bw - ox)) ch = (k + r) % 2 ? 'W' : 'w';   // the backrest, either side of her
+    if (r === 6) ch = 'W';                                                            // seat
+    if (r === 7) ch = 'w';
+    if (r === 8 && (k === 0 || k === bw - 1)) ch = 'L';                               // bench legs
+    const f = k - ox; if (f >= 0 && f < 5 && me[r][f] !== '.') ch = me[r][f];
+    if (ch === '.') continue;
+    const x = (c + k) * cs, y = top + r * cs;
+    block(x, y, ME_PAL[ch], liftAt(x, y, t), tint);
+  }
+  if (phaseKey === 'night' && !near) {
+    ctx.font = `700 ${Math.round(cs * 1.2)}px ui-monospace, Menlo, monospace`;
+    for (let i = 0; i < 2; i++) { const q = (t / 2600 + i * .5) % 1; ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - q)})`; ctx.fillText('z', (c + ox + 5) * cs + q * cs * 2, top - q * cs * 3); }
+  }
+}
+
 // The ground only moves while a ripple runs or the pointer is near it; the rest of the time a cached copy is drawn.
 function drawLand(t, P) {
   const live = ripples.length || mY > H - topRows * cs - cs * 4;
@@ -1281,6 +1315,7 @@ function drawFigures(t, P) {                                // tree or lamp, and
     block(x, y, YOKO_PAL[ch], lift, tint);
     if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint, YOKO_PAL.F, .12, [208, 128, 36]);   // Yoko: deep amber eyes
   }));
+  drawBench(t, tint);
 }
 
 // Sakura petals: spawned one at a time like shooting stars, but drifting down slowly, swaying and flipping.
@@ -1313,12 +1348,22 @@ function drawPetals(t, dt, P) {
 // The falling snacks to catch: pixel fish and a chicken drumstick. Each has a golden version for the bonus drop (+5).
 const FISH = ['................', '.......bb.......', '.....BBBBBB..F..', '...BBBBBBBBB.FF.', '..BBKBBBBBBBBFFF', '..BBBBBBBBBBBFF.', '...WWWWWWWWW.FF.', '.....WWWWWW..F..', '................'];
 const DRUM = ['..............', '.......MMMM...', '.....MMMMMMMM.', '....MMhhMMMMMm', '....MhhMMMMMMm', '....MMMMMMMMMm', '.....MMMMMMMm.', '......MMMMmm..', '.....EEmm.....', '....EEe.......', '...EEe........', '..EEe.........', '.EEeEE........', '..............'];
+const SHRIMP = ['.............', '..a..........', '.a.KSSSS.....', '..SSSSSSSS...', '..SSLSSSSSS..', '...sSSSSSSS..', '.....sSSSSS..', '.....sSSSSS..', '..FF.SSSSs...', '.FFFFsSSs....', '.FFF.........'];
+const BONE = ['...............', '.....w..w..w...', '.....w..w..w...', '.WWW.w..w..w..W', '.WKWWWWWWWWWWWW', '.WWW.w..w..w..W', '.....w..w..w...', '.....w..w..w...', '...............'];
+const TUNA = ['..............', '.SSSSSSSSSSSS.', '.SsssssssssSS.', '.RRRRRRRRRRRR.', '.RRRRWWWRRWRR.', '.RRRWWKWWWWRR.', '.RRRRWWWRRWRR.', '.RRRRRRRRRRRR.', '.ssssssssssss.', '.SSSSSSSSSSSS.'];
+const BISCUIT = ['..............', '.CC........CC.', '.CCC......CCC.', '.CCCCCCCCCCCC.', '.CCKCCCCCCKCC.', '.CCCCCPPCCCCC.', '..CCCCCCCCCC..', '...cccccccc...', '..............'];
 const GOLD_FISH = { B: '#f2c14e', b: '#d49a2a', W: '#fff4cc', F: '#e0a21b', K: '#7a4f06' };
 const SNACKS = [
   { grid: FISH, pal: { B: '#6fa8dc', b: '#3d6f9e', W: '#e8f2fb', F: '#4a82b8', K: '#1d2540' }, goldPal: GOLD_FISH },               // blue fish
   { grid: FISH, pal: { B: '#ff9a7a', b: '#d9593a', W: '#ffe3d6', F: '#e8745a', K: '#4a1f14' }, goldPal: GOLD_FISH },               // salmon
   { grid: DRUM, pal: { M: '#d9822b', m: '#a85a1a', h: '#f4b45a', E: '#fbf3e0', e: '#d8cdb0' },
     goldPal: { M: '#f2c14e', m: '#d49a2a', h: '#fff0a0', E: '#fff4cc', e: '#e8d9a0' } },                                          // chicken drumstick
+  { grid: SHRIMP, pal: { S: '#ff8f6a', s: '#e0563a', L: '#ffc9a8', K: '#1d2540', a: '#e0563a', F: '#ff6f4a' },
+    goldPal: { S: '#f2c14e', s: '#d49a2a', L: '#fff4cc', K: '#7a4f06', a: '#d49a2a', F: '#e0a21b' } },                              // shrimp
+  { grid: BONE, pal: { W: '#f4f1e6', w: '#cfc8b0', K: '#2a2a3a' }, goldPal: { W: '#fff4cc', w: '#e8c860', K: '#7a4f06' } },         // fish bone
+  { grid: TUNA, pal: { S: '#d5dbe5', s: '#8f9bb0', R: '#d9473a', W: '#ffffff', K: '#1d2540' },
+    goldPal: { S: '#f2c14e', s: '#d49a2a', R: '#e0a21b', W: '#fff4cc', K: '#7a4f06' } },                                            // tuna can
+  { grid: BISCUIT, pal: { C: '#e0a86a', c: '#b87a3a', K: '#6a3a14', P: '#8a4a2a' }, goldPal: { C: '#f2c14e', c: '#d49a2a', K: '#7a4f06', P: '#a85a14' } },   // cat biscuit
 ];
 function snackSprite(gold, kind = 0) {                                    // drawn once per pixel size, then copied
   const s = Math.max(2, Math.round(packSize() / 9)), k = SNACKS[kind] ? kind : 0, key = `snack-${gold}-${k}-${s}`, { grid, pal, goldPal } = SNACKS[k];

@@ -36,6 +36,11 @@ Open `index.html` in a browser, or put the file on any static host (Cloudflare P
    - **Netlify**: drag the folder in, or connect the repo.
 4. Set `url` in `CONFIG` to your live address so the QR code and NFC link point at it.
 
+## The scene
+
+- **Snacks:** the things that fall are drawn in `SNACKS` in `app.js` (fish, chicken, shrimp, fish bone, tuna can, cat biscuit). Each has a golden version for the +5 bonus. Add a pixel grid and a colour palette to add another kind.
+- **Mini me:** the figure resting on the bench at the right-hand side is `ME_ROWS` and `ME_PAL` in `app.js`. Change the letters or colours to change her hair, outfit or skin tone. She opens her eyes when the pointer gets close.
+
 ## Hidden secrets
 
 Eleven things in the scenes react to a tap, and a counter beside the cat score tracks how many a visitor has found. Finding all of them earns a lucky pack. The list and what each does are in `SECRETS` and `secretTap` in `app.js`.
