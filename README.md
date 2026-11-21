@@ -58,3 +58,6 @@ MIT, see `LICENSE`.
 
 ## Sibling pack
 Six real photos of Echo and Yoko together (`sib1.jpg` to `sib6.jpg`), all legendary. Defined as `SETS.siblings` in app.js.
+
+## More cats
+The Cat pack has 20 extra pixel cats (`c-` ids, built with `newCat` in app.js): 8 common, 6 uncommon, 4 rare, 2 legendary. It now holds 41 cards.

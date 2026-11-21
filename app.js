@@ -178,6 +178,50 @@ SETS.siblings = { name: 'Sibling pack', title: 'Sibling Series', reward: 'braggi
   ['sib-window', 'Window Seat', 'sib5.jpg', '50% 62%', 'Echo on the sofa, Yoko on patrol.'],
   ['sib-floor', 'Floor Loaf', 'sib6.jpg', '50% 55%', 'Yoko peeks round the corner at Echo.'],
 ].forEach(([id, name, img, pos, flavour]) => CARDS.push({ set:'siblings', id, star:'Echo & Yoko', name, rarity:'legendary', glyph:'', ink:'#ffffff', flavour, art: `url('${img}') ${pos} / cover no-repeat` }));
+/* ================= 20 more cats for the Cat pack: 8 common, 6 uncommon, 4 rare, 2 legendary ================= */
+const CAT_BASE = ['.N..........N.', '.NN........NN.', '.NNNNNNNNNNNN.', 'NNNNNNNNNNNNNN', 'NNEKNNNNNNEKNN', 'NNNNNNPPNNNNNN', '.NNNNWWWWNNNN.', '..NNNNNNNNNN..', '...NNNNNNNN...'];
+const CAT_P = { N:'#c19a6b', n:'#9a7549', E:'#9aa878', K:'#2a1d14', P:'#f08aa0', W:'#fbf3ea' };
+const SHUT = [[4, 2, 'K'], [4, 3, 'K'], [4, 10, 'K'], [4, 11, 'K']];
+const newCat = (id, name, rarity, ink, flavour, bg, pal, { pre = [], post = [], edits = [] } = {}) =>
+  ({ id, name, rarity, glyph: '', ink, flavour, art: pixelArt([...pre, ...edit(CAT_BASE, edits.flatMap(e => typeof e[0] === 'number' ? [e] : e)), ...post], { ...CAT_P, ...pal }, bg) });
+CARDS.push(
+  newCat('c-bean', 'Sleepy Bean', 'common', '#ffffff', 'Asleep before the nap even started.', 'linear-gradient(160deg,#2b2a5e,#5a4a9a)', { N:'#9aa0b4', n:'#6f7590', W:'#d8dcea' }, { edits: [SHUT] }),
+  newCat('c-sun', 'Sunbeam Nap', 'common', '#5a3a08', 'Follows the sun around the flat, one patch at a time.', 'radial-gradient(circle at 80% 15%,#fff6a0 0 14%,transparent 15%),linear-gradient(160deg,#fff2c4,#ffd27a)', {}, { edits: [SHUT] }),
+  newCat('c-milk', 'Milk Mustache', 'common', '#4a1f3a', 'Stole the milk. Wearing the evidence.', 'linear-gradient(160deg,#ffe3ee,#ffb3d1)', { N:'#c8ccd8', n:'#9aa0b4', M:'#ffffff' }, { edits: [seg(7, 4, 'MMMMMM'), seg(8, 6, 'MM')] }),
+  newCat('c-eyes', 'Treat Radar', 'common', '#3a2410', 'Heard the treat bag. From three rooms away.', 'linear-gradient(160deg,#ffe9a8,#ffbf5a)', { N:'#2a2636', n:'#1c1a26', W:'#8a8fa6', Y:'#ffd84a' },
+    { edits: [[4, 2, 'Y'], [4, 3, 'Y'], [5, 2, 'Y'], [5, 3, 'K'], [4, 10, 'Y'], [4, 11, 'Y'], [5, 10, 'K'], [5, 11, 'Y']] }),
+  newCat('c-chonk', 'Chonk', 'common', '#1d3a1a', 'Not fat. Fluffy and structurally generous.', 'linear-gradient(160deg,#e6f6e0,#a8d8a0)', {},
+    { edits: [seg(7, 0, 'NNNNNNNNNNNNNN'), seg(8, 0, 'NNNNNNNNNNNNNN')], post: ['.NNNNNNNNNNNN.', 'NNNNNNNNNNNNNN', 'NNnNNNNNNNnNNN', '.NNNNNNNNNNNN.'] }),
+  newCat('c-yarn', 'Yarn Ball', 'common', '#3b2470', 'Started with one string. Now it is a lifestyle.', 'linear-gradient(160deg,#efe6ff,#c3a8ff)', { R:'#e0463c', r:'#a82a24' },
+    { post: ['..NNNNNNNN.RR.', '.NNNNNNNNN.RRR', '.NNNNNNNNNRrRR'] }),
+  newCat('c-window', 'Bird TV', 'common', '#123a5a', 'Bird TV is on. Do not touch the remote.', 'radial-gradient(circle at 22% 70%,#fff 0 7%,transparent 8%),radial-gradient(circle at 78% 62%,#fff 0 9%,transparent 10%),linear-gradient(180deg,#9fd8ff,#e8f6ff)', { N:'#9aa0b4', n:'#6f7590' },
+    { edits: [[4, 2, 'K'], [4, 3, 'E'], [4, 10, 'K'], [4, 11, 'E']] }),
+  newCat('c-sock', 'Sock Thief', 'common', '#4a2a08', 'Nobody saw. The sock saw. The sock is not talking.', 'linear-gradient(160deg,#fff0d6,#ffd9a0)', { S:'#ffffff', s:'#e0463c' },
+    { edits: [seg(7, 6, 'SS'), seg(8, 6, 'ss')], post: ['......SS......', '......ss......'] }),
+  newCat('c-pirate', 'Pirate Cat', 'uncommon', '#ffffff', 'Has buried treats under every sofa cushion.', 'linear-gradient(160deg,#7fd0ff,#2b7fe0)', { R:'#d93a34', D:'#1c1a26' },
+    { edits: [seg(2, 1, 'RRRRRRRRRRRR'), [3, 0, 'R'], [3, 13, 'R'], [3, 10, 'D'], [3, 11, 'D'], [4, 10, 'D'], [4, 11, 'D']] }),
+  newCat('c-wizard', 'Wizard Cat', 'uncommon', '#ffffff', 'Casts Summon Dinner. It is super effective.', 'linear-gradient(160deg,#2b2a5e,#6a4cc0)', { H:'#7b4cf0', Y:'#ffd84a' },
+    { pre: ['......HH......', '.....HHYH.....', '....HHHHHH....'], edits: [seg(2, 1, 'HHHHHHHHHHHH')] }),
+  newCat('c-detective', 'Detective', 'uncommon', '#3a2410', 'The case of the missing treat. The suspect: you.', 'linear-gradient(160deg,#f3ead8,#d9c9a8)', { B:'#7a5230', b:'#4a2f18' },
+    { pre: ['.....BBBB.....', '....BbbbbB....'], edits: [seg(2, 1, 'BBBBBBBBBBBB')] }),
+  newCat('c-bath', 'Bubble Bath', 'uncommon', '#0f3a3a', 'Tolerates the bath. Remembers it forever.', 'linear-gradient(160deg,#c8f0ec,#6cc4c0)', { b:'#bfe8ff', W:'#ffffff' },
+    { edits: [seg(7, 0, 'bWbWbWbWbWbWbW'), seg(8, 0, 'WbWbWbWbWbWbWb')], post: ['bWbWbWbWbWbWbW'] }),
+  newCat('c-pumpkin', 'Pumpkin Cat', 'uncommon', '#ffd9a0', 'Trick or treat. Mostly treat.', 'linear-gradient(160deg,#3a1f5a,#1a1030)', { N:'#2a2636', n:'#1c1a26', E:'#ffd84a', W:'#6a5a7a', O:'#ff8a1c', o:'#c85a08', g:'#4a9a4a' },
+    { pre: ['......gg......', '....OOOOOO....', '...OOoOOoOO...'] }),
+  newCat('c-snow', 'Snow Day', 'uncommon', '#ffffff', 'Has never seen snow. Has strong opinions about it.', 'radial-gradient(circle at 20% 25%,#fff 0 3%,transparent 4%),radial-gradient(circle at 75% 40%,#fff 0 3%,transparent 4%),radial-gradient(circle at 55% 15%,#fff 0 2.5%,transparent 3.5%),linear-gradient(160deg,#9fc4f0,#4a7ac0)',
+    { N:'#f4f6fa', n:'#c9d2e0', W:'#dfe6f2', E:'#5aa0e0', R:'#e0463c' }, { edits: [seg(7, 2, 'RWRWRWRWRW'), seg(8, 3, 'WRWRWRWR')], post: ['.....RR.......', '.....WW.......'] }),
+  newCat('c-astro', 'Astro Cat', 'rare', '#ffffff', 'One small step for cat. One giant leap off the sofa.', 'radial-gradient(circle at 20% 20%,#fff 0 1.5%,transparent 2.5%),radial-gradient(circle at 80% 30%,#fff 0 1.5%,transparent 2.5%),radial-gradient(circle at 60% 80%,#fff 0 1.5%,transparent 2.5%),linear-gradient(160deg,#0b0b2a,#2a1f6a)', { S:'#e8ecf8', R:'#e0463c' },
+    { pre: ['....SSSSSS....'], edits: [[2, 0, 'S'], [2, 13, 'S'], ...[3, 4, 5, 6, 7].flatMap(y => [[y, 0, 'S'], [y, 13, 'S']])], post: ['..SSSSSSSSSS..', '..SSSSRRSSSS..'] }),
+  newCat('c-royal', 'Royal Cat', 'rare', '#ffe9a8', 'Rules the sofa. Taxes in treats.', 'linear-gradient(160deg,#5a1f7a,#2a0f4a)', { Y:'#f2c14e', R:'#c8323c' },
+    { pre: ['...Y..Y..Y....', '...YRYYYYRY...'], post: ['..RRRRRRRRRR..', '.RRWRRRRRRWRR.'] }),
+  newCat('c-ghost', 'Ghost Cat', 'rare', '#e8e0ff', 'Boo. Also, can I have a treat.', 'linear-gradient(160deg,#4a3a8a,#1a1030)', { N:'#ffffff', n:'#dde0ee', W:'#ffffff' },
+    { edits: [[4, 2, 'K'], [4, 3, 'K'], [5, 2, 'K'], [5, 3, 'K'], [4, 10, 'K'], [4, 11, 'K'], [5, 10, 'K'], [5, 11, 'K'], [5, 6, 'n'], [5, 7, 'n']], post: ['.NNNNNNNNNNNN.', '.NN.NNNNNN.NN.', '.N...NNNN...N.'] }),
+  newCat('c-rainbow', 'Rainbow Cat', 'rare', '#3a1f5a', 'Found the end of the rainbow. It was a sunbeam.', 'repeating-linear-gradient(180deg,#ff8b8b 0 8%,#ffbf6b 8% 16%,#fff39a 16% 24%,#a5eaa8 24% 32%,#8fd3ff 32% 40%,#c9a8ff 40% 48%,#ffd0f0 48% 100%)', { N:'#ffffff', n:'#e6d8e8', W:'#fff0f6' }),
+  newCat('c-gold', 'Golden Cat', 'legendary', '#3a2200', 'Polished by a thousand pets.', 'radial-gradient(circle at 50% 45%,#fffbe8 0 30%,#f2c14e 62%,#6a3a12 100%)', { N:'#f2c14e', n:'#d89a1a', E:'#7a4a10', K:'#5a3a08', W:'#fff3c0', Q:'#ffffff' },
+    { edits: [[0, 6, 'Q'], [0, 8, 'Q'], [1, 4, 'Q'], [1, 9, 'Q']] }),
+  newCat('c-galaxy', 'Galaxy Cat', 'legendary', '#ffffff', 'Made of stardust and mild disrespect.', 'radial-gradient(circle at 30% 30%,rgba(255,127,224,.6) 0,transparent 40%),radial-gradient(circle at 75% 70%,rgba(90,200,255,.6) 0,transparent 45%),linear-gradient(160deg,#0b0b2a,#2a1f6a)', { N:'#3a2a6a', n:'#2a1f52', E:'#ffd84a', W:'#6a5aa0', c:'#ffffff', y:'#ffd84a' },
+    { edits: [[2, 5, 'c'], [3, 3, 'y'], [3, 9, 'c'], [6, 2, 'c'], [7, 6, 'y'], [7, 9, 'c'], [8, 5, 'c'], [5, 12, 'y']] }),
+);
 CARDS.forEach(c => { c.set ||= 'cats'; });
 const inSet = k => CARDS.filter(c => c.set === k);
 // Copies other people already hold, so serial numbers look like a live set.
