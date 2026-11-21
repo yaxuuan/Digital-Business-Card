@@ -1,18 +1,18 @@
 /* ================= EDIT ME: the card owner ================= */
 // Leave a field '' to hide its icon.
 const CONFIG = {
-  name: 'Your Name',
-  title: 'Your Title',
-  org: 'Your Organisation',
-  bio: 'A line or two about you. What you make, what you are into, what you are open to.',
+  name: 'Ya Xuan',
+  title: 'Marketing Student',
+  org: '',
+  bio: 'Marketing student based in Singapore. Save my contact, then open a pack to meet my cats.',
   photo: '',                                   // blank shows initials
   background: '',                              // e.g. 'bg.jpg' turns that photo into the pixel background; blank shows the time-of-day scenes
-  timeZone: 'Etc/UTC', place: 'Your City',   // the sky follows the owner's local time
-  email: 'you@example.com',
+  timeZone: 'Asia/Singapore', place: 'Singapore',   // the sky follows the owner's local time
+  email: 'luayaxuan@gmail.com',
   phone: '',                      // goes into the saved contact
   telegram: '',  // username without @
-  instagram: '',  // username without @
-  linkedin: '',   // full profile URL
+  instagram: 'yaxuuan',  // username without @
+  linkedin: 'https://www.linkedin.com/in/ya-xuan-lua-7ab069260',   // full profile URL
   github: '',                         // username without @; blank hides the icon
   // Optional list of things you've built: { name, blurb, url }. Left empty, the Projects section is one link to your GitHub.
   projects: [],
