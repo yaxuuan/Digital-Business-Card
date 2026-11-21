@@ -24,20 +24,20 @@ const BP = { O:'#e8a868', o:'#c98a50', W:'#fbf3ea', w:'#e6d8c8', L:'#b97e48', E:
 // Packs a visitor can choose between. Every card belongs to one (cards with no `set` go in the cat pack).
 const RAYS = 'repeating-conic-gradient(rgba(255,255,255,.22) 0 10deg, transparent 10deg 20deg)';
 const SETS = {
-  dev:  { name: 'Dev pack', title: 'Dev Series', reward: 'Echo put on a scarf',
-          art: pixelArt(['..XX.......XX..', '.X...........X.', '.X...........X.', '.X...........X.', 'X....X.X.X....X', '.X...........X.', '.X...........X.', '.X...........X.', '..XX.......XX..'],
-                        { X: '#ffffff' }, RAYS + ', linear-gradient(160deg,#2a1f86,#120c40)') },
+  dev:  { name: 'Marketing pack', title: 'Marketing Series', reward: 'Echo put on a scarf',
+          art: pixelArt(['..XX...XX..', '.XXXX.XXXX.', 'XXXXXXXXXXX', 'XXXXXXXXXXX', '.XXXXXXXXX.', '..XXXXXXX..', '...XXXXX...', '....XXX....', '.....X.....'],
+                        { X: '#ffffff' }, RAYS + ', linear-gradient(160deg,#ff8fb8,#b58cff)') },
   cats: { name: 'Cat pack', title: 'Cat Memes', reward: 'Echo was crowned',
           art: pixelArt(['F.....F.O.....O', 'FFFFFFF.OOOWOOO', 'FAFFFAF.OEOWOEO', 'FFFPFFF.OOWPWOO', '.FyyyF...WWWWW.', '.FFFFF...OWWWO.', 'FFFFFFF.OOWWWOO'],
                         { ...BP, F: '#e89a48', A: '#7a4a10', y: '#f8dcae' }, RAYS + ', radial-gradient(circle,#fff6dc,#ffd9a0 70%)') },
 };
 // The owner's collectible set. Art is drawn with CSS; swap `art` for url('card.jpg') center/cover to use an image.
 const CARDS = [
-  { set:'dev', id:'hello',   name:'Hello World', rarity:'common',    glyph:'{ }', art:'linear-gradient(160deg,#dfe6f1,#8da0c2)', ink:'#1d2540', flavour:'First commit, first coffee, first card.' },
-  { set:'dev', id:'night',   name:'Night Shift', rarity:'common',    glyph:'☾',   art:'radial-gradient(circle at 70% 30%,#4a4f9e,#151640 70%)', ink:'#f5e9b8', flavour:'Ships best between 11 pm and 2 am.' },
-  { set:'dev', id:'board',   name:'Whiteboard',  rarity:'uncommon',  glyph:'⇄',   art:'linear-gradient(160deg,#eef8f1,#86cfa8)', ink:'#123a28', flavour:'Every good plan starts as boxes and arrows.' },
-  { set:'dev', id:'hack',    name:'Hackathon',   rarity:'rare',      glyph:'48h', gs:'22cqw', art:'linear-gradient(150deg,#0f2d6b,#2b7fe0 55%,#8fd0ff)', ink:'#ffffff', flavour:'Three pivots and one demo that worked.' },
-  { set:'dev', id:'keynote', name:'Keynote',     rarity:'legendary', glyph:'★',   art:'radial-gradient(circle at 50% 35%,#fff1bd,#e0a21b 45%,#5a3300 100%)', ink:'#3a2200', flavour:'The rarest pull in the set: on stage, mid-demo.' },
+  { set:'dev', id:'hello',   name:'First Post',       rarity:'common',    glyph:'♥',   art:'linear-gradient(160deg,#ffe3ee,#ffa8c8)', ink:'#5a1f3a', flavour:'First post, first like, first big idea.' },
+  { set:'dev', id:'night',   name:'Content Calendar', rarity:'common',    glyph:'31',  gs:'24cqw', art:'linear-gradient(160deg,#efe6ff,#c3a8ff)', ink:'#3b2470', flavour:'Every day of the month has a plan. Mostly.' },
+  { set:'dev', id:'board',   name:'Brand Board',      rarity:'uncommon',  glyph:'✿',   art:'linear-gradient(160deg,#fff0f6,#d9b8ff 60%,#ffb3d1)', ink:'#4a1f5a', flavour:'Colors, fonts and vibes, all on one page.' },
+  { set:'dev', id:'hack',    name:'Campaign',         rarity:'rare',      glyph:'#',   art:'linear-gradient(150deg,#7b4cf0,#c36bff 55%,#ffb0e0)', ink:'#ffffff', flavour:'One big idea, every platform.' },
+  { set:'dev', id:'keynote', name:'Gone Viral',       rarity:'legendary', glyph:'★',   art:'radial-gradient(circle at 50% 35%,#fff1bd,#ff9ec2 45%,#7a2a8a 100%)', ink:'#3a0f3a', flavour:'The rarest pull in the set: a post that took off.' },
   // Cat cards: pixel art drawn from the grids below ('.' is see-through).
   { id:'loaf', name:'Loaf', rarity:'common', glyph:'', ink:'#3a2410', flavour:'Has achieved perfect loaf. Do not disturb.',
     art: pixelArt(['..O........O..', '..OO......OO..', '..OOODOODOOO..', '.OOOOOOOOOOOO.', '.OOKOOOOOOKOO.', '.OOKOOOOOOKOO.', '.OOOOOPPOOOOO.', '..OOOOOOOOOO..',

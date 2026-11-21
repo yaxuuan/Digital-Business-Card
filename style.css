@@ -367,45 +367,51 @@ button.empty:hover { border-color:var(--accent); color:var(--fg); }
 .empty > :not(.sil) { position:relative; }
 @media (max-width:799px) { .grid { grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; } .empty { font-size:10px; } .empty b { font-size:22px; } .empty small { font-size:10px; } }
 
-/* ---------- warm & playful theme ----------
-   The panel and sheets become soft cream with coral and teal accents. The HUD pills, toast and pack stage stay dark glass so they read over the scene. */
+/* ---------- kawaii pastel pink & lavender theme ----------
+   The panel and sheets are soft pink with sticker-style pill buttons. HUD pills, toast and the pack stage stay dark plum glass so they read over the scene. */
+:root { --bg:#3a2250; }
 .panel, .sheet {
-  --fg:#3a2418; --muted:#7a5a48; --surface:#fff4e6; --accent:#d94a2d; --accent-ink:#ffffff;
-  --glass-line:rgba(90,50,25,.2); --line:rgba(90,50,25,.14);
+  --fg:#4a2545; --muted:#8a5f86; --surface:#fff0f7; --accent:#d6408a; --accent-ink:#4a1238;
+  --glass-line:rgba(110,50,100,.25); --line:rgba(110,50,100,.16);
+  color:var(--fg);
 }
-.panel, .sheet, .dback { color:var(--fg); }
-.panel { border-radius:30px; box-shadow:0 20px 50px rgba(60,20,40,.3), 0 0 0 4px rgba(255,255,255,.35); }
-body[data-phase] .panel { background:rgba(255,244,230,.88); }
-.sheet { border-radius:28px; }
+.dback { color:var(--fg); }
+.hud { background:rgba(58,34,80,.55); }
+.panel { border-radius:36px; border:3px solid #fff; box-shadow:0 18px 44px rgba(90,30,110,.35), 0 0 0 5px rgba(255,170,215,.45); }
+body[data-phase] .panel { background:rgba(255,238,247,.92); }
+.sheet { border-radius:32px; border:3px solid #fff; }
 h1, h2, h3, .btn, .eyebrow { letter-spacing:0; }
-.avatar { background:#ff9ec2; border-color:#ffc94a; box-shadow:0 4px 0 rgba(90,50,25,.25); }
-.btn, .strip, .proj, .ico, .hello input { background:rgba(120,70,40,.07); }
-.btn { border-radius:18px; }
-.btn.primary { background:#ff6b4a; border-color:#ff6b4a; color:#fff; box-shadow:0 4px 0 #a8321a; }
-.btn.primary:active { box-shadow:0 1px 0 #a8321a; }
-.sheet .btn.primary { background:#ff6b4a; color:#fff; box-shadow:none; }
-.btn.open { background:#0f8a80; border-color:#0f8a80; box-shadow:0 4px 0 #0a5f58; }
-.btn.open:active { box-shadow:0 1px 0 #0a5f58; }
-.btn:hover, .strip:hover, a.proj:hover { border-color:#ff6b4a; }
-.ico { color:var(--fg); }
+.avatar { color:#4a2545; background:linear-gradient(135deg,#ffb3d4,#c3a8ff); border:4px solid #fff; box-shadow:0 0 0 3px #ff9ec8, 0 5px 0 rgba(120,50,120,.25); }
+.btn, .strip, .proj, .ico, .hello input { background:rgba(255,255,255,.7); }
+.btn { border:2px solid rgba(110,50,100,.3); border-radius:999px; }
+.btn.primary, .sheet .btn.primary { background:#ff9ec8; border-color:#4a2545; color:#4a1238; }
+.btn.primary { box-shadow:0 4px 0 #4a2545; }
+.btn.primary:active { box-shadow:0 1px 0 #4a2545; }
+.sheet .btn.primary { box-shadow:none; }
+.btn.open { background:#c3a8ff; border-color:#4a2545; color:#2b1060; box-shadow:0 4px 0 #4a2545; }
+.btn.open:active { box-shadow:0 1px 0 #4a2545; }
+.btn:hover, .strip:hover, a.proj:hover { border-color:#e0508f; }
+.strip, .proj { border-radius:20px; }
+.ico { color:var(--fg); border:2px solid rgba(110,50,100,.25); }
 .ico:hover, .ico:focus-visible { color:#fff; }
 .icoL:hover small, .icoL:focus-visible small { color:var(--fg); }
-.ico-email { --brand:#e8527f; } .ico-qr { --brand:#0f8a80; } .ico-github { --brand:#5a3a2a; }
-details.odds summary:hover { color:var(--fg); border-color:#ff6b4a; }
+.ico-email { --brand:#ff6fa8; } .ico-linkedin { --brand:#5b7bff; } .ico-instagram { --brand:#e0508f; }
+.ico-qr { --brand:#9a6bff; } .ico-github { --brand:#6a4a7a; } .ico-telegram { --brand:#4aa8e0; }
+details.odds summary:hover { color:var(--fg); border-color:#e0508f; }
 .sheet .qrbox { background:#fff; }
-.empty { border-color:rgba(90,50,25,.28); }
+.empty { border-color:rgba(110,50,100,.3); }
 .empty small, .back, .strip-head i { color:var(--accent); }
 .hello input { color:var(--fg); }
 
-/* packs and card backs: berry pink for the Dev pack, orange stays for cats */
-.pack, .pk-mini { --p1:#ff9ec2; --p2:#e8527f; --p3:#7a1f45; }
-.pack.set-cats, .pk-mini.set-cats { --p1:#ffc27a; --p2:#f08a3c; --p3:#8a3a12; }
+/* packs and card backs: pink Marketing pack, lavender Cat pack */
+.pack, .pk-mini { --p1:#ffb3d4; --p2:#ff6fa8; --p3:#8a1f5a; }
+.pack.set-cats, .pk-mini.set-cats { --p1:#d9c6ff; --p2:#9a6bff; --p3:#40208a; }
 .pack.lucky { --p1:#fff0b0; --p2:#e0a21b; --p3:#7a4f06; }
 .pk-mini { color:#fff; }
-.pk-mini.on { box-shadow:0 0 0 2px #ff6b4a; }
+.pk-mini.on { box-shadow:0 0 0 2px #e0508f; }
 .cback, .dback {
-  --fg:#fff4e6; --muted:#f1c9b6;
-  background:radial-gradient(circle, rgba(255,255,255,.12) 0 2px, transparent 3px) 0 0 / 14px 14px, repeating-linear-gradient(45deg,#5a2342 0 9px,#6a2c4e 9px 18px);
+  --fg:#fff0f7; --muted:#f1c9e6;
+  background:radial-gradient(circle, rgba(255,255,255,.18) 0 2px, transparent 3px) 0 0 / 14px 14px, repeating-linear-gradient(45deg,#7a3a8a 0 9px,#8a4a9a 9px 18px);
 }
-.cback span { background:#3d1730; }
-.stage-wrap { background-image:radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--rc, #e8527f) 24%, transparent), transparent 60%); background-color:#24141f; }
+.cback span { background:#4a1f66; }
+.stage-wrap { background-image:radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--rc, #ff6fa8) 26%, transparent), transparent 60%); background-color:#2a1740; }
