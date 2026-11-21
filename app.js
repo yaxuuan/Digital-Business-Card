@@ -1651,6 +1651,18 @@ function frame(t) {
   drawSky(t, P); drawLand(t, P); drawPetals(t, dt, P); drawTapFx(t, dt); drawSecrets(t); drawPacks(t, dt); drawEffects(t); drawFireworks(t);
 }
 requestAnimationFrame(frame);
+/* ================= owner unlock ================= */
+// Opening the page with #unlock-<secret phrase> gives the owner every card on that device. Only a hash of the phrase is stored here.
+(async () => {
+  if (!location.hash.startsWith('#unlock-') || !crypto.subtle) return;
+  const phrase = decodeURIComponent(location.hash.slice(8)), buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(phrase));
+  history.replaceState(null, '', location.pathname + location.search);
+  if ([...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('') !== 'cbe65a1ebebd95edd765b0c79d145f672eaa52dfcf1787dc640141e35c4a4ef0') return;
+  const pulls = CARDS.map((c, i) => ({ id: c.id, serial: i + 1, t: Date.now(), isNew: true, first: true, lucky: false, shiny: false, treats: 0 }));
+  store.set('cardstock-state', { pulls, serials: {}, dupStreak: 0, treats: 100, bonus: 0, done: [] });
+  location.reload();
+})();
+
 if (!store.get('cardstock-hint', false)) { $('intro').hidden = false; $('introOk').onclick = () => { $('intro').hidden = true; store.set('cardstock-hint', true); }; }
 $('moreBtn').onclick = () => { const open = $('panel').classList.toggle('open'); $('moreBtn').setAttribute('aria-expanded', open); $('moreBtn').textContent = open ? 'Show less' : 'More about me'; };
 
