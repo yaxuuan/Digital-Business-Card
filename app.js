@@ -19,8 +19,8 @@ const CONFIG = {
   url: 'https://yaxuuan.github.io/Digital-Business-Card/',   // the address on your NFC card and QR; blank = this page
 };
 // Palettes for the two cats in the meme cards: FP = the fluffy orange cat, BP = the orange-and-white cat.
-const FP = { F:'#eeb060', f:'#f6cf90', s:'#cf8a3c', A:'#e8a41c', K:'#2a1d14', P:'#e58f8f', p:'#f4b6a6', w:'#f8dcae', W:'#ffffff', R:'#d93a34', Y:'#f5c842', T:'#f08aa0', L:'#efe6d6', D:'#4a4f5c' };
-const BP = { O:'#e8a868', o:'#c98a50', W:'#fbf3ea', w:'#e6d8c8', L:'#b97e48', E:'#9aa878', K:'#2a1d14', P:'#d8907a', p:'#f0b0a0', G:'#e6f6ff', g:'#a9d4ea', m:'#8a6a58', S:'#ffffff' };
+const FP = { F:'#c19a6b', f:'#dcc3a0', s:'#9a7549', A:'#e8a41c', K:'#2a1d14', P:'#e58f8f', p:'#f4b6a6', w:'#f8dcae', W:'#ffffff', R:'#d93a34', Y:'#f5c842', T:'#f08aa0', L:'#efe6d6', D:'#4a4f5c' };
+const BP = { O:'#c19a6b', o:'#9a7549', W:'#fbf3ea', w:'#e6d8c8', L:'#8a6238', E:'#9aa878', K:'#2a1d14', P:'#d8907a', p:'#f0b0a0', G:'#e6f6ff', g:'#a9d4ea', m:'#8a6a58', S:'#ffffff' };
 // Packs a visitor can choose between. Every card belongs to one (cards with no `set` go in the cat pack).
 const RAYS = 'repeating-conic-gradient(rgba(255,255,255,.22) 0 10deg, transparent 10deg 20deg)';
 const SETS = {
@@ -29,7 +29,7 @@ const SETS = {
                         { X: '#ffffff' }, RAYS + ', linear-gradient(160deg,#ff8fb8,#b58cff)') },
   cats: { name: 'Cat pack', title: 'Cat Memes', reward: 'Echo was crowned',
           art: pixelArt(['F.....F.O.....O', 'FFFFFFF.OOOWOOO', 'FAFFFAF.OEOWOEO', 'FFFPFFF.OOWPWOO', '.FyyyF...WWWWW.', '.FFFFF...OWWWO.', 'FFFFFFF.OOWWWOO'],
-                        { ...BP, F: '#e89a48', A: '#7a4a10', y: '#f8dcae' }, RAYS + ', radial-gradient(circle,#fff6dc,#ffd9a0 70%)') },
+                        { ...BP, F: '#c19a6b', A: '#7a4a10', y: '#f8dcae' }, RAYS + ', radial-gradient(circle,#fff6dc,#ffd9a0 70%)') },
 };
 // The owner's collectible set. Art is drawn with CSS; swap `art` for url('card.jpg') center/cover to use an image.
 const CARDS = [
@@ -42,7 +42,7 @@ const CARDS = [
   { id:'loaf', name:'Loaf', rarity:'common', glyph:'', ink:'#3a2410', flavour:'Has achieved perfect loaf. Do not disturb.',
     art: pixelArt(['..O........O..', '..OO......OO..', '..OOODOODOOO..', '.OOOOOOOOOOOO.', '.OOKOOOOOOKOO.', '.OOKOOOOOOKOO.', '.OOOOOPPOOOOO.', '..OOOOOOOOOO..',
                    '.OOOOOOOOOOOO.', 'ODOOODOOODOOOO', 'OOOOOOOOOOOOOO', '.OOOOOOOOOOOO.'],
-                  { O:'#f0a040', D:'#c8742a', K:'#2a1d14', P:'#f08aa0' }, 'linear-gradient(160deg,#fff4e0,#ffd29a)') },
+                  { O:'#c19a6b', D:'#9a7549', K:'#2a1d14', P:'#f08aa0' }, 'linear-gradient(160deg,#fff4e0,#ffd29a)') },
   { id:'keys', name:'Keyboard Cat', rarity:'common', glyph:'', ink:'#1d2030', flavour:'Sat on the keyboard. Pushed straight to main.',
     art: pixelArt(['..G........G..', '..GG......GG..', '..GGGGGGGGGG..', '.GGGGGGGGGGGG.', '.GGEKGGGGEKGG.', '.GGGGGGGGGGGG.', '.GGGGGPPGGGGG.', '..GGGGGGGGGG..',
                    '...GGGGGGGG...', 'BBBBBBBBBBBBBB', 'BkBkBkBkBkBkBB', 'BBkBkBkBkBkBkB', 'BBBBBBBBBBBBBB'],
@@ -83,7 +83,7 @@ const CARDS = [
                    '..WWWmmmmWWW..', '...WWWWWWWW...'], BP, 'linear-gradient(150deg,#1a2a5c,#3a6fd0 55%,#a8c8ff)') },
   { id:'duo', star:'Yoko & Echo', name:'Double Trouble', rarity:'legendary', glyph:'', ink:'#3a2200', flavour:'Yoko knocks it off the table. Echo watches.',
     art: pixelArt(['F.....F.O.....O', 'FFFFFFF.OOOWOOO', 'FAFFFAF.OEOWOEO', 'FFFPFFF.OOWPWOO', '.FyyyF...WWWWW.', '.FFFFF...OWWWO.', 'FFFFFFF.OOWWWOO', 'FFFFFFF.OOWWWOO'],
-                  { ...BP, F:'#e89a48', A:'#7a4a10', y:'#f8dcae' }, 'radial-gradient(circle at 50% 45%,#fffbe8 0 34%,#f2c14e 60%,#6a3a12 100%)') },
+                  { ...BP, F:'#c19a6b', A:'#7a4a10', y:'#f8dcae' }, 'radial-gradient(circle at 50% 45%,#fffbe8 0 34%,#f2c14e 60%,#6a3a12 100%)') },
   // More memes, with other cats.
   { id:'buffer', name:'Buffering', rarity:'common', glyph:'', ink:'#3a2410', flavour:'Staring at the wall. Loading. Please wait.',
     art: pixelArt(['..............', '....o.o.o.....', '..............', '...G......G...', '...GG....GG...', '...GGGGGGGG...', '..GGGGGGGGGG..', '..GGGGGGGGGG..',
@@ -844,9 +844,9 @@ function block(x, y, c, lift, tint) {
 const TRUNK = [120, 84, 52];
 // The mascot: Echo, the owner's orange-and-white cat, in blocks, sitting. Cream-orange fur, white blaze, muzzle, chest and paws, sleepy eyes.
 // Yoko, the fluffy orange cat, sits to Echo's left with wide-open eyes.
-const YOKO_PAL = { F: [238, 176, 96], f: [207, 138, 60], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28] };
+const YOKO_PAL = { F: [193, 154, 107], f: [154, 117, 73], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28] };
 const yokoRows = t => ['F.....F', 'FFFFFFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FFFFF.', '.FFFFF.', '.FF.FF.'];
-const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], O: [232, 168, 104], o: [201, 138, 80], W: [251, 243, 234], E: [214, 160, 70], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
+const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [214, 160, 70], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
 // Each eye is painted on its block's top face: amber iris, dark pupil, glint, and a fur-coloured lid over the top third (sleepy, not shut).
 let hopT = -1e9, awakeUntil = 0;                           // last catch (the cat hops), and how long it stays awake at night
 const catAsleep = t => phaseKey === 'night' && !scene.waving && t > awakeUntil && score < 25;
@@ -1261,13 +1261,13 @@ const CAT = [
   '.O...........O.', '.OO.........OO.', '.OpO.......OpO.', '.OppOOOOOOOppO.', 'OOOOOoOWOoOOOOO', 'OOOOoOWWWoOOOOO', 'OOLLLOWWWOLLLOO',
   'OOEKEOWWWOEKEOO', 'OOOOOWWWWWOOOOO', '.OOOWWWPWWWOOO.', '.OOWWWWWWWWWOO.', '..WWWWWWWWWWW..', '...WWWWWWWWW...', '....WWW.WWW....',
 ];
-const CAT_PAL = { O: '#e8a868', o: '#c98a50', W: '#fbf3ea', L: '#a8703c', E: '#c99a50', K: '#3a2a1e', P: '#d8907a', p: '#f0b0a0' };
+const CAT_PAL = { O: '#c19a6b', o: '#9a7549', W: '#fbf3ea', L: '#8a6238', E: '#c99a50', K: '#3a2a1e', P: '#d8907a', p: '#f0b0a0' };
 const GOLD_PAL = { ...CAT_PAL, O: '#f2c14e', o: '#d49a2a', W: '#fff4cc', L: '#b07a1a', E: '#fff0a0' };
 const YOKO = [
   '.F...........F.', '.FF.........FF.', '.FpF.......FpF.', '.FppFFFFFFFppF.', 'FFFFsFFsFFsFFFF', 'FFFFFFFFFFFFFFF', 'FFAAAFFFFFAAAFF',
   'FFAKAFFFFFAKAFF', 'FFFFFFFFFFFFFFF', '.FFFFyyPyyFFFF.', '.FFFyyyyyyyFFF.', '..FFFyyyyyFFF..', '...FFFFFFFFF...', '....FFF.FFF....',
 ];
-const YOKO_SPR = { F: '#eeb060', s: '#cf8a3c', A: '#e8a41c', K: '#2a1d14', P: '#e58f8f', p: '#f4b6a6', y: '#f8dcae' };
+const YOKO_SPR = { F: '#c19a6b', s: '#9a7549', A: '#e8a41c', K: '#2a1d14', P: '#e58f8f', p: '#f4b6a6', y: '#f8dcae' };
 const YOKO_GOLD = { ...YOKO_SPR, F: '#f2c14e', s: '#d49a2a', y: '#fff4cc', A: '#fff0a0' };
 function catSprite(gold, yoko = false) {                                  // drawn once per pixel size, then copied
   const s = Math.max(2, Math.round(packSize() / 9)), key = `cat-${gold}-${yoko}-${s}`, grid = yoko ? YOKO : CAT;
