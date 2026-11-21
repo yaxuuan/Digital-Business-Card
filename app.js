@@ -845,15 +845,15 @@ const TRUNK = [120, 84, 52];
 // The mascot: Echo, the owner's orange-and-white cat, in blocks, sitting. Cream-orange fur, white blaze, muzzle, chest and paws, sleepy eyes.
 // Yoko, the fluffy orange cat, sits to Echo's left with wide-open eyes.
 const YOKO_PAL = { F: [193, 154, 107], f: [154, 117, 73], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28] };
-const yokoRows = t => ['F.....F', 'FFFFFFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FFFFF.', '.FFFFF.', '.FF.FF.'];
-const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [214, 160, 70], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
+const yokoRows = t => ['F.....F', 'FFfFfFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'];   // tabby stripes, pale chest
+const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [168, 154, 72], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
 // Each eye is painted on its block's top face: amber iris, dark pupil, glint, and a fur-coloured lid over the top third (sleepy, not shut).
 let hopT = -1e9, awakeUntil = 0;                           // last catch (the cat hops), and how long it stays awake at night
 const catAsleep = t => phaseKey === 'night' && !scene.waving && t > awakeUntil && score < 25;
-function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36) {
+function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36, iris = BOT_PAL.E) {
   const f = cs - 1, pw = Math.max(2, Math.round(f * .3)), lid = Math.round(f * lidK), lash = Math.max(1, Math.round(f * .1));
   const look = mX < -900 ? 0 : Math.round(Math.max(-1, Math.min(1, (mX - x - cs / 2) / (cs * 8))) * f * .22);   // pupils follow the pointer
-  ctx.fillStyle = shade(BOT_PAL.E, 1, tint); ctx.fillRect(x, top, f, f);
+  ctx.fillStyle = shade(iris, 1, tint); ctx.fillRect(x, top, f, f);
   ctx.fillStyle = shade([40, 28, 20], 1, tint); ctx.fillRect(x + Math.round((f - pw) / 2) + look, top + lid, pw, f - lid);
   ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.fillRect(x + Math.round((f - pw) / 2) + look - lash, top + lid + lash, lash * 1.5, lash * 1.5);
   ctx.fillStyle = shade(lidCol, 1, tint); ctx.fillRect(x, top, f, lid);
@@ -1219,13 +1219,13 @@ function drawFigures(t, P) {                                // tree or lamp, and
   if ((S.done || []).includes('cats')) [[1, 0], [3, -1], [5, 0], [2, 0], [4, 0]].forEach(([k, up]) => block(bx + k * cs, by - cs + up * cs, BOT_PAL.Y, 0, tint));   // Cat pack complete: a crown
   const yx = (botC - 10) * cs, yy = groundTop(botC) - 8 * cs - hop * .6, yr = yokoRows(t);   // Yoko
   const ysw = Math.sin(t * .0017 + 2) * .45;
-  [[0, 7, 'F'], [-1, 7, 'f'], [-2, 6, 'F']].forEach(([dx, dy, ch]) => block(yx + dx * cs, yy + dy * cs, YOKO_PAL[ch], liftAt(yx + dx * cs, yy + dy * cs, t), tint));
-  block(yx - 2 * cs + Math.round(ysw) * cs, yy + 5 * cs - Math.abs(ysw) * cs * .7, YOKO_PAL.f, 0, tint);
+  [[0, 7, 'F'], [-1, 7, 'F'], [-2, 7, 'f'], [-1, 6, 'F'], [-2, 6, 'F'], [-3, 6, 'f'], [-2, 5, 'F']].forEach(([dx, dy, ch]) => block(yx + dx * cs, yy + dy * cs, YOKO_PAL[ch], liftAt(yx + dx * cs, yy + dy * cs, t), tint));   // bushy tail
+  block(yx - 2 * cs + Math.round(ysw) * cs, yy + 4 * cs - Math.abs(ysw) * cs * .7, YOKO_PAL.f, 0, tint);
   yr.forEach((row, r) => [...row].forEach((ch, k) => {
     if (ch === '.') return;
     const x = yx + k * cs, y = yy + r * cs, lift = liftAt(x, y, t);
     block(x, y, YOKO_PAL[ch], lift, tint);
-    if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint, YOKO_PAL.F, .12);
+    if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint, YOKO_PAL.F, .12, [208, 128, 36]);   // Yoko: deep amber eyes
   }));
 }
 
@@ -1261,7 +1261,7 @@ const CAT = [
   '.O...........O.', '.OO.........OO.', '.OpO.......OpO.', '.OppOOOOOOOppO.', 'OOOOOoOWOoOOOOO', 'OOOOoOWWWoOOOOO', 'OOLLLOWWWOLLLOO',
   'OOEKEOWWWOEKEOO', 'OOOOOWWWWWOOOOO', '.OOOWWWPWWWOOO.', '.OOWWWWWWWWWOO.', '..WWWWWWWWWWW..', '...WWWWWWWWW...', '....WWW.WWW....',
 ];
-const CAT_PAL = { O: '#c19a6b', o: '#9a7549', W: '#fbf3ea', L: '#8a6238', E: '#c99a50', K: '#3a2a1e', P: '#d8907a', p: '#f0b0a0' };
+const CAT_PAL = { O: '#c19a6b', o: '#9a7549', W: '#fbf3ea', L: '#8a6238', E: '#a89a4c', K: '#3a2a1e', P: '#d8907a', p: '#f0b0a0' };
 const GOLD_PAL = { ...CAT_PAL, O: '#f2c14e', o: '#d49a2a', W: '#fff4cc', L: '#b07a1a', E: '#fff0a0' };
 const YOKO = [
   '.F...........F.', '.FF.........FF.', '.FpF.......FpF.', '.FppFFFFFFFppF.', 'FFFFsFFsFFsFFFF', 'FFFFFFFFFFFFFFF', 'FFAAAFFFFFAAAFF',
