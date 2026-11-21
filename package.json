@@ -1,0 +1,5 @@
+{
+  "name": "digital-business-card",
+  "private": true,
+  "scripts": { "test": "node --test tests/" }
+}

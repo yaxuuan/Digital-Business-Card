@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- EDIT: these show when the link is shared in WhatsApp, Telegram, LinkedIn. Also add og:url, a canonical link and og:image (plus og:image:width 1200 and height 630) with a full https:// URL of a 1200x630 picture to show one. -->
+<title>Your Name</title>
+<meta name="description" content="Short description of you. Save my contact, then open a pack to collect one of my cards.">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Your Name · Your Title">
+<meta property="og:description" content="Save my contact, then open a pack to collect one of my cards.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2b1d2e">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<button class="hud" id="phaseBtn" title="Tap to preview other times of day"></button>
+<div class="hud" id="score" title="Cats caught" hidden></div>
+<div class="hud-bl">
+  <button class="hud" id="soundBtn" aria-pressed="false">♪ Turn sound on</button>
+  <button class="hud" id="peekBtn" aria-pressed="false">Hide card</button>
+</div>
+
+<main class="wrap" id="profileView">
+  <section class="panel" id="panel" aria-label="Business card">
+    <div class="who">
+      <div class="avatar" id="avatar"></div>
+      <div><p class="eyebrow" id="clock"></p><h1 id="name"></h1></div>
+    </div>
+    <p class="role" id="role"></p>
+    <nav class="icons" id="icons" aria-label="Contact and social links"></nav>
+    <div class="cta">
+      <button class="btn primary" id="saveBtn">Save contact</button>
+      <button class="btn open" id="openBtn">Open a pack →</button>
+    </div>
+    <p class="status" id="packStatus" aria-live="polite"></p>
+    <button class="more-btn" id="moreBtn" aria-expanded="false" aria-controls="more">More about me</button>
+    <div class="more" id="more">
+      <p class="bio" id="bio"></p>
+      <div class="projects" id="projects"></div>
+      <button class="btn" id="helloBtn">Send me your details</button>
+      <div class="shelf" id="setPick" role="group" aria-label="Choose a pack"></div>
+      <a class="strip" href="#binder" aria-label="Open your binder">
+        <span class="strip-head"><b>Collection</b><span id="binderCount"></span><i>View binder →</i></span>
+        <span class="strip-cards" id="strip"></span>
+      </a>
+      <details class="odds"><summary>Pack odds</summary><table id="oddsTable"></table></details>
+    </div>
+  </section>
+</main>
+
+<main class="wrap" id="binderView" hidden>
+  <section class="panel" aria-labelledby="binderTitle">
+    <button class="back" id="backBtn">← Back to profile</button>
+    <div class="bhead"><h2 id="binderTitle">Your binder</h2><span class="totals" id="totals"></span></div>
+    <div class="owner"><b id="ownerName"></b><span id="ownerProgress"></span></div>
+    <div class="sets" id="binderGrid"></div>
+  </section>
+</main>
+
+<div class="scrim" id="qrModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <span class="label">Scan to open this card</span>
+    <h3 id="qrTitle"></h3>
+    <div class="qrbox" id="qrBox"></div>
+    <p class="url" id="qrUrl"></p>
+    <div class="btns">
+      <button class="btn primary" id="qrSave">Add to contacts</button>
+      <button class="btn" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="detailModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Card detail">
+    <div class="dflip" id="dflip">
+      <div class="detail-card dface" id="detailCard"></div>
+      <div class="dface dback"><span class="label">About this copy</span><dl class="facts" id="detailFacts"></dl></div>
+    </div>
+    <div class="btns two">
+      <button class="btn" id="detailFlip">Flip card</button>
+      <button class="btn" id="detailShare">Share</button>
+      <button class="btn primary" id="detailSave">Add to contacts</button>
+      <button class="btn" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="craftModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="craftTitle">
+    <span class="label">Spend treats</span>
+    <h3 id="craftTitle"></h3>
+    <p class="url" id="craftText"></p>
+    <div class="btns">
+      <button class="btn primary" id="craftOk">Get this card</button>
+      <button class="btn" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="helloModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helloTitle">
+    <span class="label">Introduce yourself</span>
+    <h3 id="helloTitle"></h3>
+    <form class="hello" id="helloForm">
+      <label for="helloName">Your name<input id="helloName" autocomplete="name" required maxlength="80"></label>
+      <label for="helloNote">Where we met, or what you do<input id="helloNote" maxlength="140"></label>
+      <label for="helloReach">Best way to reach you<input id="helloReach" maxlength="120" placeholder="Phone, email or LinkedIn"></label>
+      <div class="btns">
+        <button class="btn primary" type="submit">Send by email</button>
+        <button class="btn" type="button" data-close>Close</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="intro" id="intro" hidden>
+  <ol><li>Save my contact</li><li>Tap the falling cats</li><li>Open a pack</li></ol>
+  <button class="chip" id="introOk">Got it</button>
+</div>
+
+<div class="stage-wrap" id="stageWrap" hidden>
+  <div class="rays" id="rays" aria-hidden="true"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <div class="fx" id="fx" aria-hidden="true"></div>
+  <div class="stage-top">
+    <span class="label" id="stageLabel"></span>
+    <span><button class="ghost" id="stageSound">♪ Sound</button> <button class="ghost" id="skipBtn" hidden>Skip</button> <button class="ghost" id="closeStage">Close</button></span>
+  </div>
+  <div class="stage">
+    <div class="slotbox" id="slotbox">
+      <div class="shock" id="shock"></div>
+      <div class="pack" id="pack" role="button" tabindex="0" aria-label="Pack. Swipe across the top, or press Enter, to open it">
+        <div class="pack-top"></div>
+        <div class="pack-body">
+          <span class="pk-brand">CARDSTOCK</span>
+          <span class="pk-mono" id="pkMono"></span>
+          <span class="pk-art" id="pkArt"></span>
+          <span class="pk-title" id="pkTitle"></span>
+          <span class="pk-name" id="pkName"></span>
+          <span class="pk-foot"><b class="pk-series">3 CARDS</b><i>● ◆ ✦ ✸</i></span>
+        </div>
+        <div class="tear"></div>
+        <div class="burst"></div>
+      </div>
+      <div class="flipbox" id="flipbox" role="button" tabindex="-1" aria-label="Face-down card. Tap to flip it">
+        <div class="flipper">
+          <div class="face"><div class="cback"><span id="backMono"></span></div></div>
+          <div class="face front" id="frontFace"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="hint" id="hint" aria-live="polite"></p>
+  <div class="result" id="result" hidden></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="rules.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
