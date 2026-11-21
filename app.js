@@ -842,6 +842,13 @@ const PHASES = {
              ground: [[92, 34, 84], [78, 28, 74], [56, 20, 58], [40, 14, 44]], prop: 'pine', back: 'bay', floor: 'rocks' },
   night:   { name: 'Night',   icon: '☾', top: [8, 10, 38],     bot: [30, 42, 86],    body: { x: .82, y: .16, c: '243,239,214', r: 22 }, mote: '190,255,140',
              ground: [[52, 90, 74], [46, 80, 66], [60, 52, 72], [40, 38, 56]], prop: 'lamp', back: 'city', floor: 'roof', stars: true },
+  // Two scenes that are never picked by the clock: visitors choose them with the scene button.
+  winter:  { name: 'Winter',  icon: '❄', top: [56, 76, 150],  bot: [220, 232, 250], body: { x: .78, y: .14, c: '244,247,255', r: 20 }, mote: '255,255,255', snow: true,
+             stops: [[0, [56, 76, 150]], [.5, [120, 146, 206]], [1, [220, 232, 250]]], horizon: .5,
+             ground: [[246, 250, 255], [226, 236, 248], [196, 212, 236], [150, 172, 208]], prop: 'snowman', back: 'winter', floor: 'snow' },
+  bedroom: { name: 'Bedroom', icon: '♡', top: [96, 68, 128],  bot: [164, 124, 170], body: { x: .5, y: .02, c: '0,0,0', r: 1 }, mote: '255,214,150',
+             stops: [[0, [96, 68, 128]], [1, [164, 124, 170]]], horizon: .6,
+             ground: [[190, 142, 94], [170, 124, 80], [140, 98, 62], [110, 76, 48]], prop: 'plant', back: 'room', floor: 'wood' },
 };
 const ORDER = ['morning', 'day', 'evening', 'night'];
 function ownerHour() {
@@ -849,15 +856,21 @@ function ownerHour() {
   return +p.find(x => x.type === 'hour').value + +p.find(x => x.type === 'minute').value / 60;
 }
 const phaseFor = t => t >= 6 && t < 11 ? 'morning' : t >= 11 && t < 17 ? 'day' : t >= 17 && t < 20 ? 'evening' : 'night';
-let phaseKey = phaseFor(ownerHour()), previewing = false;
+let sceneChoice = store.get('cardstock-scene', 'auto');      // 'auto' follows the owner's clock; anything else is a scene the visitor pinned
+if (sceneChoice !== 'auto' && !PHASES[sceneChoice]) sceneChoice = 'auto';
+let phaseKey = sceneChoice === 'auto' ? phaseFor(ownerHour()) : sceneChoice;
 function renderClock() {
-  if (!previewing) phaseKey = phaseFor(ownerHour());
+  phaseKey = sceneChoice === 'auto' ? phaseFor(ownerHour()) : sceneChoice;
   const P = PHASES[phaseKey]; document.body.dataset.phase = phaseKey;
-  $('phaseBtn').textContent = `${P.icon} ${P.name}${previewing ? ' (preview)' : ''}`;
+  $('phaseBtn').textContent = `${P.icon} ${P.name}${sceneChoice === 'auto' ? '' : ' (pinned)'}`;
   const time = new Intl.DateTimeFormat('en-US', { timeZone: CONFIG.timeZone, hour: 'numeric', minute: '2-digit' }).format(new Date());
   $('clock').textContent = `${time} in ${CONFIG.place}`;
 }
-$('phaseBtn').onclick = () => { previewing = true; phaseKey = ORDER[(ORDER.indexOf(phaseKey) + 1) % 4]; renderClock(); };
+$('phaseBtn').onclick = () => {                              // cycles: follow the clock, then each scene in turn
+  const seq = ['auto', ...Object.keys(PHASES)];
+  sceneChoice = seq[(seq.indexOf(sceneChoice) + 1) % seq.length]; store.set('cardstock-scene', sceneChoice);
+  renderClock(); toast(sceneChoice === 'auto' ? 'Scene follows the time in ' + CONFIG.place : PHASES[phaseKey].name + ' scene. Tap again for the next one.');
+};
 
 const cv = $('scene');
 let ctx = cv.getContext('2d');
@@ -872,7 +885,7 @@ function offscreen(draw) {
 }
 const blit = c => ctx.drawImage(c, 0, 0, W, H);
 const scene = { waving: false };
-let W = 0, H = 0, cs = 8, cols = 0, heights = [], treeC = 0, botC = 0, stars = [], motes = [], clouds = [], city = [], islands = [], branches = [], blossoms = [], baseRows = 6, topRows = 0, heightsBy = {};
+let W = 0, H = 0, cs = 8, cols = 0, heights = [], treeC = 0, botC = 0, stars = [], motes = [], clouds = [], city = [], islands = [], branches = [], blossoms = [], baseRows = 6, topRows = 0, heightsBy = {}, flakes = [];
 let ripples = [], rings = [], fireworks = [],packs = [], sparks = [], meteors = [], nextMeteor = 0, petals = [], nextPetal = 0, nextPack = 1800, lastTrail = 0, trailX = -99, trailY = -99, mX = -999, mY = -999;
 let score = store.get('cardstock-score', 0);
 const seeded = s => () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -894,6 +907,8 @@ function resize() {
     day: () => base - 1,
     evening: c => Math.max(2, Math.round(base - 2 + 3.4 * Math.abs(Math.sin(c * .47 + 1)) + 1.5 * Math.sin(c * .13))),
     night: () => base,
+    winter: c => Math.max(3, Math.round(base + 1.5 * Math.sin(c * .15 + .5) + Math.sin(c * .06))),
+    bedroom: () => base - 1,
   };
   heightsBy = {};
   for (const k of Object.keys(shapes)) {
@@ -906,6 +921,7 @@ function resize() {
   topRows = Math.max(...Object.values(heightsBy).flat());
   const rnd = seeded(7);
   stars = Array.from({ length: Math.floor(W * H / 6000) }, () => ({ x: rnd() * W, y: rnd() * H * .65, s: rnd() * 1.6 + .5, p: rnd() * 6 }));
+  flakes = Array.from({ length: Math.floor(W * H / 8000) }, () => ({ x: rnd() * W, y: rnd() * H, v: 16 + rnd() * 34, p: rnd() * 6, s: rnd() < .25 ? 3 : 2 }));
   motes = Array.from({ length: Math.floor(W * H / 20000) }, () => ({ x: rnd() * W, y: rnd() * H, v: 8 + rnd() * 16, p: rnd() * 6 }));
   clouds = Array.from({ length: mobile() ? 3 : 5 }, () => ({ x: rnd() * W, y: H * (.06 + rnd() * .3), w: 5 + (rnd() * 5 | 0), v: 5 + rnd() * 9 }));
   city = []; for (let x = 0; x < W;) { const w = (3 + (rnd() * 5 | 0)) * cs, h = (5 + (rnd() * 15 | 0)) * cs; city.push({ x, w, h, seed: rnd() * 1000 | 0 }); x += w + (rnd() < .3 ? cs : 0); }
@@ -959,7 +975,7 @@ const yokoRows = t => {
 const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], V: [255, 127, 176], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [168, 154, 72], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
 // Each eye is painted on its block's top face: amber iris, dark pupil, glint, and a fur-coloured lid over the top third (sleepy, not shut).
 let hopT = -1e9, awakeUntil = 0;                           // last catch (the cat hops), and how long it stays awake at night
-const catAsleep = t => phaseKey === 'night' && !scene.waving && t > awakeUntil && score < 25;
+const catAsleep = t => (phaseKey === 'night' || phaseKey === 'bedroom') && !scene.waving && t > awakeUntil && score < 25;
 function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36, iris = BOT_PAL.E) {
   const f = cs - 1, pw = Math.max(2, Math.round(f * .3)), lid = Math.round(f * lidK), lash = Math.max(1, Math.round(f * .1));
   const look = mX < -900 ? 0 : Math.round(Math.max(-1, Math.min(1, (mX - x - cs / 2) / (cs * 8))) * f * .22);   // pupils follow the pointer
@@ -1049,7 +1065,7 @@ function drawSky(t, P) {
     ctx.fillStyle = `rgba(${P.clouds},.85)`;
     ctx.fillRect(x + cs * 2, y - cs, (c.w - 4) * cs, cs); ctx.fillRect(x + cs, y, (c.w - 2) * cs, cs); ctx.fillRect(x, y + cs, c.w * cs, cs);
   }
-  if (!P.petals) for (const m of motes) {                   // dust in the light by day, fireflies at night (morning has petals instead)
+  if (!P.petals && !P.snow) for (const m of motes) {                   // dust in the light by day, fireflies at night (morning has petals instead)
     const y = ((m.y + (P.petals ? 1 : -1) * t / 1000 * m.v) % H + H) % H, x = m.x + Math.sin(t * .0008 + m.p) * (P.petals ? 26 : 10);   // petals fall, dust rises
     ctx.globalAlpha = .25 + .55 * Math.abs(Math.sin(t * .0016 + m.p));
     const ms = P.stars || P.petals ? 3 : 2;
@@ -1057,6 +1073,11 @@ function drawSky(t, P) {
   }
   ctx.globalAlpha = 1;
   if (!bgImg) drawBack(t, P);
+  if (P.snow) for (const f of flakes) {                      // snowfall, in front of the mountains
+    const y = reduced() ? f.y : (f.y + t / 1000 * f.v) % H, x = f.x + (reduced() ? 0 : Math.sin(t * .0009 + f.p) * 14);
+    ctx.globalAlpha = .9; ctx.fillStyle = '#ffffff'; ctx.fillRect(x | 0, y | 0, f.s, f.s);
+  }
+  ctx.globalAlpha = 1;
 }
 
 /* ---------- custom background: CONFIG.background (any photo) becomes pixel art for every visitor ---------- */
@@ -1214,6 +1235,54 @@ function drawBack(t, P) {
         if (k < 4) { ctx.fillStyle = k === 0 && Math.sin(t * .002 + b.seed) > .6 ? 'rgba(255,214,120,.25)' : 'rgba(255,214,120,.85)'; ctx.fillRect(b.x + i, top + j, p, p); }
       }
     }
+  } else if (P.back === 'winter') {                         // snowy mountains and pines under a cold sky
+    const p = pxs();
+    blit(cache.winter ||= offscreen(() => {
+      const far = x => (Math.sin(x * .0045 + 1) * .5 + .5) * H * .2 + (Math.sin(x * .013) * .5 + .5) * H * .05 + H * .04;
+      const near = x => (Math.sin(x * .007 + 3) * .5 + .5) * H * .1 + (Math.sin(x * .021 + 1) * .5 + .5) * H * .03 + H * .02;
+      for (const [fn, body, cap] of [[far, 'rgb(170,190,226)', 'rgb(246,249,255)'], [near, 'rgb(118,144,196)', 'rgb(222,233,251)']]) {
+        for (let x = 0; x < W; x += p) {
+          const h = Math.round(fn(x) / p) * p, c = Math.min(h, Math.round(h * .36 / p) * p);
+          ctx.fillStyle = body; ctx.fillRect(x, horizon - h, p, h + p * 4); ctx.fillStyle = cap; ctx.fillRect(x, horizon - h, p, c);
+        }
+      }
+      for (let i = 0; i < Math.floor(W / 80); i++) {          // pines
+        const x = Math.round(((i * 131 + 40) % W) / p) * p, rows = 5 + (i * 7) % 4, base = horizon + p * 2;
+        ctx.fillStyle = 'rgb(88,62,48)'; ctx.fillRect(x, base - p, p, p * 2);
+        for (let j = 0; j < rows; j++) {
+          const half = 1 + Math.floor(j * .7), y = base - (rows - j + 1) * p;
+          ctx.fillStyle = 'rgb(34,72,86)'; ctx.fillRect(x - half * p, y, (half * 2 + 1) * p, p);
+          if (j % 2 === 0) { ctx.fillStyle = 'rgb(236,244,255)'; ctx.fillRect(x - half * p, y, Math.max(p, half * p), p); }
+        }
+      }
+    }));
+  } else if (P.back === 'room') {                           // a cosy bedroom: wallpaper, a window onto the night, fairy lights
+    const p = pxs(), floorY = H - baseRows * cs;
+    const win = { w: cs * 14, h: Math.min(cs * 16, floorY * .5) }; win.x = Math.round((mobile() ? W * .5 : W * .64) / p) * p; win.y = Math.round(H * .09 / p) * p;
+    blit(cache.room ||= offscreen(() => {
+      for (let y = 0; y < floorY; y += p * 2) { ctx.fillStyle = `rgb(${mix([100, 72, 130], [162, 122, 170], y / floorY)})`; ctx.fillRect(0, y, W, p * 2); }
+      ctx.fillStyle = 'rgba(255,255,255,.055)'; for (let x = 0; x < W; x += cs * 4) ctx.fillRect(x, 0, cs * 2, floorY);   // stripes
+      ctx.fillStyle = 'rgb(240,220,204)'; ctx.fillRect(0, floorY - cs, W, cs); ctx.fillStyle = 'rgb(214,190,176)'; ctx.fillRect(0, floorY - p, W, p);   // skirting board
+      const wood = 'rgb(222,178,126)';
+      ctx.fillStyle = wood; ctx.fillRect(win.x - p * 2, win.y - p * 2, win.w + p * 4, win.h + p * 4);
+      for (let y = 0; y < win.h; y += p) { ctx.fillStyle = `rgb(${mix([16, 20, 62], [72, 64, 140], y / win.h)})`; ctx.fillRect(win.x, win.y + y, win.w, p); }
+      ctx.fillStyle = '#fffbe6'; for (let i = 0; i < 9; i++) ctx.fillRect(win.x + ((i * 53 + 17) % (win.w / p | 0)) * p, win.y + ((i * 37 + 5) % (win.h / p * .7 | 0)) * p, p, p);   // stars
+      pdisc(win.x + win.w * .28, win.y + win.h * .28, cs * 1.4, '243,239,214');   // the moon
+      ctx.fillStyle = wood; ctx.fillRect(win.x + win.w / 2 - p, win.y, p * 2, win.h); ctx.fillRect(win.x, win.y + win.h / 2 - p, win.w, p * 2);
+      ctx.fillStyle = 'rgb(196,150,104)'; ctx.fillRect(win.x - p * 4, win.y + win.h + p * 2, win.w + p * 8, p * 2);
+      for (const [fx, fy, col] of [[mobile() ? .12 : .86, .2, '255,170,200'], [mobile() ? .84 : .93, .4, '170,200,255']]) {   // two framed pictures with a paw print
+        const x = Math.round(W * fx / p) * p, y = Math.round(H * fy / p) * p, w = cs * 6, h = cs * 7;
+        ctx.fillStyle = wood; ctx.fillRect(x, y, w, h); ctx.fillStyle = `rgb(${col})`; ctx.fillRect(x + p * 2, y + p * 2, w - p * 4, h - p * 4);
+        ctx.fillStyle = 'rgb(255,255,255)'; ctx.fillRect(x + cs * 2, y + cs * 3, cs * 2, cs * 2); [[1, 2], [2, 2], [4, 2], [5, 2]].forEach(([a, b]) => ctx.fillRect(x + a * cs - cs * .2, y + b * cs, p, p));
+      }
+    }));
+    const cols6 = ['255,214,120', '255,150,190', '150,220,255', '190,255,170'];
+    ctx.fillStyle = 'rgb(70,56,84)';                          // the string of fairy lights, with twinkling bulbs
+    for (let x = 0; x < W; x += p) ctx.fillRect(x, Math.round((cs * 1.4 + Math.sin(x / W * Math.PI * 5) * cs * 1.1) / p) * p, p, p);
+    for (let x = cs * 3, i = 0; x < W; x += cs * 5, i++) {
+      const y = Math.round((cs * 1.4 + Math.sin(x / W * Math.PI * 5) * cs * 1.1) / p) * p + p, a = .55 + .45 * Math.sin(t * .003 + i * 1.7);
+      pdisc(x, y + p, cs * 1.1, cols6[i % 4], .12 * a); ctx.fillStyle = `rgba(${cols6[i % 4]},${.6 + .4 * a})`; ctx.fillRect(Math.round(x / p) * p, y, p, p * 2);
+    }
   }
 }
 
@@ -1254,6 +1323,15 @@ function drawProp(t, P, tint) {
   } else if (P.prop === 'pine') {                           // dark pine silhouette, like the trees on the islands
     at(0, 1, [44, 16, 46]); at(0, 2, [44, 16, 46]);
     [[3, 2], [4, 2], [5, 1], [6, 1], [7, 0], [8, 0]].forEach(([up, half]) => { for (let k = -half; k <= half; k++) at(k, up, [52, 20, 56]); });
+  } else if (P.prop === 'snowman') {
+    const sn = [248, 250, 255], dk = [40, 36, 52];
+    for (let k = -2; k <= 2; k++) { at(k, 1, sn); at(k, 2, sn); }
+    for (let k = -1; k <= 1; k++) { at(k, 3, sn); at(k, 4, [214, 60, 70]); at(k, 6, dk); }
+    at(-1, 5, dk); at(0, 5, [255, 150, 60]); at(1, 5, dk); at(0, 7, dk);
+    at(-3, 3, TRUNK); at(-4, 4, TRUNK); at(3, 3, TRUNK); at(4, 4, TRUNK);   // stick arms
+  } else if (P.prop === 'plant') {                          // a potted plant
+    for (let k = -1; k <= 1; k++) { at(k, 1, [200, 104, 74]); at(k, 2, [200, 104, 74]); }
+    for (const [k, up, c] of [[0, 3, 1], [-1, 4, 0], [1, 4, 0], [0, 4, 1], [-2, 5, 0], [2, 5, 0], [-1, 5, 1], [0, 5, 0], [1, 5, 1], [-1, 6, 0], [1, 6, 0], [0, 6, 1], [0, 7, 0]]) at(k, up, c ? [70, 150, 92] : [96, 184, 110]);
   } else if (P.prop === 'lamp') {
     const gx = x0 + cs / 2, gy = g - 7.5 * cs, glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, cs * 9);
     glow.addColorStop(0, 'rgba(255,214,140,.45)'); glow.addColorStop(1, 'rgba(255,214,140,0)');
@@ -1292,7 +1370,7 @@ function drawBench(t, tint) {
     const x = (c + k) * cs, y = top + r * cs;
     block(x, y, ME_PAL[ch], liftAt(x, y, t), tint);
   }
-  if (phaseKey === 'night' && !near) {
+  if ((phaseKey === 'night' || phaseKey === 'bedroom') && !near) {
     ctx.font = `700 ${Math.round(cs * 1.2)}px ui-monospace, Menlo, monospace`;
     for (let i = 0; i < 2; i++) { const q = (t / 2600 + i * .5) % 1; ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - q)})`; ctx.fillText('z', (c + bw - 2) * cs + q * cs * 2, top + 2 * cs - q * cs * 3); }
   }
@@ -1317,6 +1395,14 @@ function tile(P, c, r) {
     if (r === 0) return hash === 0 ? [240, 128, 156] : hash < 3 ? [112, 44, 96] : top1;
     return hash === 1 ? [84, 30, 78] : hash < 5 ? sub : deep;
   }
+  if (P.floor === 'snow') {                                 // snow drifts over frosty ground
+    if (r === 0) return c % 2 ? [248, 251, 255] : [238, 244, 253];
+    return r < 3 ? [[222, 234, 250], [214, 228, 248]][hash % 2] : [[190, 206, 234], [170, 188, 220], [150, 170, 206]][hash % 3];
+  }
+  if (P.floor === 'wood') {                                 // wooden floorboards with seams
+    if (r === 0) return c % 6 === 0 ? [140, 96, 60] : c % 2 ? [196, 148, 98] : [186, 138, 90];
+    return (c + r * 2) % 7 === 0 ? [118, 80, 50] : [[170, 122, 80], [160, 114, 74], [150, 106, 68]][hash % 3];
+  }
   if (P.floor === 'roof') {                                 // rooftop: pale stone ledge over brickwork with offset mortar lines
     if (r === 0) return c % 2 ? [98, 100, 124] : [88, 90, 114];
     return (c + (r % 2) * 2) % 4 === 0 ? [36, 32, 48] : [[78, 46, 60], [88, 52, 64], [68, 40, 56]][hash % 3];
@@ -1338,7 +1424,7 @@ function drawGround(t, P, still) {
   }
 }
 function drawFigures(t, P) {                                // tree or lamp, and the cat: small, and they animate
-  const tint = P.stars ? [.8, .8, .95] : P.back === 'bay' ? [1.08, .82, .96] : ONE;
+  const tint = P.stars ? [.8, .8, .95] : P.back === 'bay' ? [1.08, .82, .96] : P.back === 'winter' ? [.94, .97, 1.06] : P.back === 'room' ? [1.06, .94, 1] : ONE;
   drawProp(t, P, tint);
   const hop = t - hopT < 380 ? Math.sin((t - hopT) / 380 * Math.PI) * cs * 1.3 : 0;   // a little jump when a snack is caught
   const rows = botRows(t), bx = botC * cs, by = groundTop(botC) - rows.length * cs - hop;
@@ -1455,6 +1541,9 @@ function tapEffect(x, y, t) {
       if (t < trainAt - 1800) { trainAt = t + 1500; toast('Train coming.'); Sound.play('bell'); }
       rings.push({ x, y, t });
     } else rings.push({ x, y, t });
+  } else if (phaseKey === 'winter' || phaseKey === 'bedroom') {   // a burst of snowflakes, or warm sparkles indoors
+    for (let i = 0; i < 14; i++) sparks.push({ x, y, vx: (Math.random() - .5) * 6, vy: -1 - Math.random() * 4, life: 1, c: phaseKey === 'winter' ? (i % 3 ? '#ffffff' : '#bcd8ff') : (i % 3 ? '#ffe9a0' : '#ffb3d4') });
+    rings.push({ x, y, t }); Sound.play(phaseKey === 'winter' ? 'petals' : 'lantern');
   } else {                                                  // evening: release a sky lantern
     if (lanterns.length < 16) lanterns.push({ x, y, t, sway: Math.random() * 6, v: 16 + Math.random() * 14 });
     if (++lanternCount === 10) secret('festival', t);
@@ -1525,7 +1614,7 @@ function secret(k, t) {
 }
 // Does this tap land on something secret in the current scene?
 function secretTap(x, y, t) {
-  if (reduced() || bgImg) return false;
+  if (reduced() || bgImg || phaseKey === 'winter' || phaseKey === 'bedroom') return false;   // the two pinned scenes have no secrets
   const P = PHASES[phaseKey], b = P.body, [sx, sy] = bodyXY(P), onBody = Math.hypot(x - sx, y - sy) < b.r * 1.5 + 10;
   const gt = groundTop(treeC), onProp = Math.abs(x - (treeC * cs + cs / 2)) < cs * 3 && y > gt - cs * 9.5 && y < gt;
   if (phaseKey === 'morning') return onBody ? secret('rainbow', t) : onProp ? secret('shower', t) : false;

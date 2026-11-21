@@ -64,3 +64,6 @@ The Cat pack has 20 extra pixel cats (`c-` ids, built with `newCat` in app.js): 
 
 ## Dress up
 `#dress` is a tab where treats buy things for Echo and Yoko to wear (`GEAR` in app.js: 7 hats, 5 neckwear, 5 face items). Ownership and what each cat wears are saved in localStorage (`cardstock-dress`), and `drawGear` paints them onto the cats in the scene.
+
+## Scenes
+The top-left button cycles: follow the time in Singapore (default), then Morning, Day, Evening, Night, Winter and Bedroom. A pinned scene is remembered in localStorage (`cardstock-scene`). Winter and Bedroom are defined in `PHASES` and drawn by the `winter` and `room` branches of `drawBack`.
