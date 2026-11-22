@@ -67,3 +67,5 @@ The Cat pack has 20 extra pixel cats (`c-` ids, built with `newCat` in app.js): 
 
 ## Scenes
 The top-left button cycles: follow the time in Singapore (default), then Morning, Day, Evening, Night, Winter and Bedroom. A pinned scene is remembered in localStorage (`cardstock-scene`). Winter and Bedroom are defined in `PHASES` and drawn by the `winter` and `room` branches of `drawBack`.
+
+The Dress up tab also has an Outfits slot, and a Rewards section: every earned extra (pack scarf, bow and crowns, the 25-snack visor, the 50-snack glow) can be switched off, and "Take everything off" clears the lot (saved as `off` in `cardstock-dress`).

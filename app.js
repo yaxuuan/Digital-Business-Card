@@ -969,7 +969,7 @@ const TRUNK = [120, 84, 52];
 const YOKO_PAL = { F: [193, 154, 107], f: [154, 117, 73], y: [248, 220, 174], P: [229, 143, 143], E: [232, 164, 28], Y: [242, 193, 78] };
 const yokoRows = t => {
   const rows = ['F.....F', 'FFfFfFF', catAsleep(t) || (t + 1700) % 6100 < 160 ? 'FfFFFfF' : 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'];   // tabby stripes, pale chest
-  if ((S.done || []).includes('yoko')) rows[0] = 'F.YYY.F';                  // Yoko pack complete: a crown
+  if (rewardShown('ycrown')) rows[0] = 'F.YYY.F';                  // Yoko pack complete: a crown
   return rows;
 };
 const BOT_PAL = { Y: [242, 193, 78], B: [70, 120, 220], V: [255, 127, 176], O: [193, 154, 107], o: [154, 117, 73], W: [251, 243, 234], E: [168, 154, 72], P: [216, 144, 122], C: [235, 84, 84], S: [30, 28, 45] };
@@ -987,9 +987,9 @@ function drawEye(x, top, tint, lidCol = BOT_PAL.O, lidK = .36, iris = BOT_PAL.E)
 }
 function botRows(t) {
   const rows = ['O.....O', 'OOOWOOO', 'OEOWOEO', 'OOWPWOO', '.WWWWW.', '.oWWWo.', '.OWWWO.', '.WW.WW.'];
-  if ((S.done || []).includes('dev')) rows[4] = '.BBBBB.';            // Dev pack complete: a scarf
-  if ((S.done || []).includes('echo')) rows[0] = 'OVV.VVO';           // Echo pack complete: a pink bow between the ears
-  if (score >= 25) rows[2] = 'OSSSSSO';                             // 25 caught: a visor
+  if (rewardShown('scarf')) rows[4] = '.BBBBB.';            // Dev pack complete: a scarf
+  if (rewardShown('bow')) rows[0] = 'OVV.VVO';           // Echo pack complete: a pink bow between the ears
+  if (rewardShown('visor')) rows[2] = 'OSSSSSO';                             // 25 caught: a visor
   else if (catAsleep(t)) rows[2] = 'OoOWOoO';                       // asleep at night until someone taps
   else if (t % 5200 < 160) rows[2] = 'OOOWOOO';                     // slow blink
   return rows;
@@ -1432,7 +1432,7 @@ function drawFigures(t, P) {                                // tree or lamp, and
     ctx.font = `700 ${Math.round(cs * 1.2)}px ui-monospace, Menlo, monospace`;
     for (let i = 0; i < 2; i++) { const k = (t / 2400 + i * .5) % 1; ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - k)})`; ctx.fillText('z', bx + 7 * cs + k * cs * 2, by - k * cs * 3); }
   }
-  if (score >= 50) {                                        // 50 caught: golden glow
+  if (rewardShown('glow')) {                                // 50 caught: golden glow
     const gx = bx + cs * 3.5, gy = by + cs * 4, g = ctx.createRadialGradient(gx, gy, 0, gx, gy, cs * 9);
     g.addColorStop(0, 'rgba(255,201,74,.55)'); g.addColorStop(1, 'rgba(255,201,74,0)');
     ctx.fillStyle = g; ctx.fillRect(gx - cs * 9, gy - cs * 9, cs * 18, cs * 18);
@@ -1447,7 +1447,7 @@ function drawFigures(t, P) {                                // tree or lamp, and
     block(x, y, BOT_PAL[ch], lift, tint);
     if (ch === 'E') drawEye(x, y - Math.max(2, cs * .22) - lift, tint);
   }));
-  if ((S.done || []).includes('cats')) [[1, 0], [3, -1], [5, 0], [2, 0], [4, 0]].forEach(([k, up]) => block(bx + k * cs, by - cs + up * cs, BOT_PAL.Y, 0, tint));   // Cat pack complete: a crown
+  if (rewardShown('crown')) [[1, 0], [3, -1], [5, 0], [2, 0], [4, 0]].forEach(([k, up]) => block(bx + k * cs, by - cs + up * cs, BOT_PAL.Y, 0, tint));   // Cat pack complete: a crown
   drawGear('echo', bx, by, t, tint);
   const yx = (botC - 10) * cs, yy = groundTop(botC) - 8 * cs - hop * .6, yr = yokoRows(t);   // Yoko
   const ysw = Math.sin(t * .0017 + 2) * .45;
@@ -1816,14 +1816,45 @@ const GEAR = [
   { id:'scarf', slot:'neck', name:'Striped Scarf', cost:10, pal:{ a:[220,60,70], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,4,x % 2 ? 'a' : 'b']), [5,5,'a'], [5,6,'b']] },
   { id:'bandana', slot:'neck', name:'Bandana', cost:12, pal:{ a:[70,120,220], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,4,'a']), [2,5,'a'], [3,5,'b'], [4,5,'a'], [3,6,'a']] },
   { id:'medal', slot:'neck', name:'Gold Medal', cost:20, pal:{ a:[70,120,220], b:[250,210,80] }, cells:[[2,4,'a'],[3,4,'a'],[4,4,'a'],[3,5,'b'],[3,6,'b']] },
+  { id:'santa', slot:'hat', name:'Santa Hat', cost:18, pal:{ a:[214,50,60], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,-1,'b']), ...[2,3,4].map(x => [x,-2,'a']), [3,-3,'a'], [4,-3,'b']] },
+  { id:'cap', slot:'hat', name:'Baseball Cap', cost:14, pal:{ a:[214,50,60], b:[255,255,255] }, cells:[...[1,2,3,4,5].map(x => [x,-1,'a']), ...[2,3,4].map(x => [x,-2,'a']), [3,-2,'b'], [0,-1,'a'], [6,-1,'a']] },
+  { id:'bunny', slot:'hat', name:'Bunny Ears', cost:16, pal:{ a:[255,255,255], b:[255,170,200] }, cells:[[1,-1,'b'],[1,-2,'a'],[1,-3,'a'],[5,-1,'b'],[5,-2,'a'],[5,-3,'a']] },
+  { id:'horns', slot:'hat', name:'Devil Horns', cost:14, pal:{ a:[214,40,60] }, cells:[[1,-1,'a'],[0,-2,'a'],[5,-1,'a'],[6,-2,'a']] },
+  { id:'chef', slot:'hat', name:'Chef Hat', cost:15, pal:{ a:[255,255,255], b:[226,230,240] }, cells:[...[1,2,3,4,5].map(x => [x,-1,'b']), ...[1,2,3,4,5].map(x => [x,-2,'a']), ...[2,3,4].map(x => [x,-3,'a'])] },
+  { id:'sprout', slot:'hat', name:'Little Sprout', cost:6, pal:{ a:[90,190,110], b:[60,150,90] }, cells:[[3,-1,'b'],[2,-2,'a'],[4,-2,'a'],[3,-2,'b']] },
+  { id:'pearls', slot:'neck', name:'Pearl Necklace', cost:14, pal:{ a:[255,250,246], b:[226,214,230] }, cells:[1,2,3,4,5].map(x => [x,4,x % 2 ? 'a' : 'b']) },
+  { id:'tie', slot:'neck', name:'Necktie', cost:10, pal:{ a:[60,100,200], b:[40,70,160] }, cells:[[3,4,'b'],[3,5,'a'],[3,6,'a']] },
+  { id:'lei', slot:'neck', name:'Flower Lei', cost:12, pal:{ a:[255,120,170], b:[255,214,80], c:[255,255,255] }, cells:[1,2,3,4,5].map(x => [x,4,['a','b','c'][x % 3]]) },
+  { id:'cape', slot:'neck', name:'Hero Cape', cost:18, pal:{ a:[214,50,60], b:[250,210,80] }, cells:[[1,4,'a'],[2,4,'b'],[4,4,'b'],[5,4,'a'],[0,5,'a'],[6,5,'a'],[0,6,'a'],[6,6,'a'],[0,7,'a'],[6,7,'a']] },
+  { id:'sweater', slot:'body', name:'Pink Sweater', cost:16, pal:{ a:[255,160,196], b:[255,226,236] }, cells:[...[1,2,3,4,5].map(x => [x,5,'a']), ...[1,2,3,4,5].map(x => [x,6,x % 2 ? 'b' : 'a'])] },
+  { id:'hoodie', slot:'body', name:'Lilac Hoodie', cost:20, pal:{ a:[186,156,236], b:[150,120,210] }, cells:[...[1,2,3,4,5].map(x => [x,5,'a']), ...[1,2,3,4,5].map(x => [x,6,'a']), [2,6,'b'],[3,6,'b'],[4,6,'b']] },
+  { id:'overalls', slot:'body', name:'Overalls', cost:18, pal:{ a:[70,120,220], b:[250,210,80], c:[250,246,240] }, cells:[[1,4,'a'],[5,4,'a'],[1,5,'b'],[2,5,'a'],[3,5,'a'],[4,5,'a'],[5,5,'b'],...[1,2,3,4,5].map(x => [x,6,'a'])] },
+  { id:'tux', slot:'body', name:'Tuxedo', cost:25, pal:{ a:[36,34,50], b:[255,255,255], c:[200,50,60] }, cells:[[3,4,'c'],[1,5,'a'],[2,5,'a'],[3,5,'b'],[4,5,'a'],[5,5,'a'],[1,6,'a'],[2,6,'a'],[3,6,'b'],[4,6,'a'],[5,6,'a']] },
+  { id:'rain', slot:'body', name:'Raincoat', cost:18, pal:{ a:[255,214,60], b:[230,170,30] }, cells:[...[1,2,3,4,5].map(x => [x,5,'a']), ...[1,2,3,4,5].map(x => [x,6,'a']), [3,5,'b'],[3,6,'b']] },
+  { id:'monocle', slot:'face', name:'Monocle', cost:8, pal:{ a:[250,210,80] }, cells:[[5,2,'a'],[6,3,'a']] },
+  { id:'stache', slot:'face', name:'Moustache', cost:10, pal:{ a:[60,40,30] }, cells:[[2,4,'a'],[3,4,'a'],[4,4,'a']] },
+  { id:'ninja', slot:'face', name:'Ninja Headband', cost:12, pal:{ a:[214,50,60], b:[250,246,240] }, cells:[...[1,2,3,4,5].map(x => [x,1,'a']), [3,1,'b'], [6,1,'a'], [6,2,'a']] },
+  { id:'rainbowspecs', slot:'face', name:'Rainbow Specs', cost:16, pal:{ a:[255,100,100], b:[255,214,80], c:[110,200,120], d:[100,160,240], e:[180,120,230] }, cells:[[1,2,'a'],[2,2,'b'],[3,2,'c'],[4,2,'d'],[5,2,'e']] },
   { id:'blush', slot:'face', name:'Blush', cost:5, pal:{ a:[255,140,170] }, cells:[[1,3,'a'],[5,3,'a']] },
   { id:'patch', slot:'face', name:'Eye Patch', cost:6, pal:{ a:[30,28,45] }, cells:[[5,2,'a']] },
   { id:'shades', slot:'face', name:'Sunglasses', cost:12, pal:{ a:[30,28,45] }, cells:[1,2,3,4,5].map(x => [x,2,'a']) },
   { id:'heartspecs', slot:'face', name:'Heart Glasses', cost:14, pal:{ a:[255,90,150], b:[200,50,110] }, cells:[[1,2,'a'],[2,2,'b'],[3,2,'b'],[4,2,'b'],[5,2,'a']] },
   { id:'starspecs', slot:'face', name:'Star Glasses', cost:14, pal:{ a:[255,214,60], b:[230,170,30] }, cells:[[1,2,'a'],[2,2,'b'],[3,2,'b'],[4,2,'b'],[5,2,'a']] },
 ];
-const GEAR_SLOTS = [['hat', 'Hats'], ['neck', 'Neckwear'], ['face', 'Face']];
+const GEAR_SLOTS = [['hat', 'Hats'], ['body', 'Outfits'], ['neck', 'Neckwear'], ['face', 'Face']];
+const DRAW_ORDER = ['body', 'neck', 'face', 'hat'];       // clothes first, then what goes on top of them
 const gearById = id => GEAR.find(g => g.id === id);
+// Things the cats earn by playing (pack rewards and snack milestones). The owner can hide every one of them.
+const doneSet = k => (S.done || []).includes(k);
+const REWARDS = [
+  { id: 'scarf', cat: 'echo', name: 'Marketing scarf', has: () => doneSet('dev') },
+  { id: 'bow', cat: 'echo', name: 'Pink bow', has: () => doneSet('echo') },
+  { id: 'crown', cat: 'echo', name: 'Cat pack crown', has: () => doneSet('cats') },
+  { id: 'visor', cat: 'echo', name: 'Cool visor', has: () => score >= 25 },
+  { id: 'glow', cat: 'echo', name: 'Golden glow', has: () => score >= 50 },
+  { id: 'ycrown', cat: 'yoko', name: 'Yoko crown', has: () => doneSet('yoko') },
+];
+const rewardShown = id => !dress.off.includes(id) && REWARDS.find(r => r.id === id).has();
 const CAT_NAMES = { echo: 'Echo', yoko: 'Yoko' };
 function loadDress() {                                      // read the saved wardrobe, keeping only items that exist, are owned and fit their slot
   const d = store.get('cardstock-dress', null) || {}, owned = (Array.isArray(d.owned) ? d.owned : []).filter(id => gearById(id)), worn = {};
@@ -1831,12 +1862,13 @@ function loadDress() {                                      // read the saved wa
     worn[who] = {};
     for (const [slot, id] of Object.entries((d.worn || {})[who] || {})) if (owned.includes(id) && gearById(id) && gearById(id).slot === slot) worn[who][slot] = id;
   }
-  return { owned: [...new Set(owned)], worn };
+  return { owned: [...new Set(owned)], worn, off: (Array.isArray(d.off) ? d.off : []).filter(id => REWARDS.some(r => r.id === id)) };
 }
 let dress = loadDress();
 const saveDress = () => store.set('cardstock-dress', dress);
 function drawGear(who, ox, oy, t, tint) {                   // blocks on top of the cat in the scene
-  for (const id of Object.values(dress.worn[who] || {})) {
+  const w = dress.worn[who] || {};
+  for (const id of DRAW_ORDER.map(sl => w[sl]).filter(Boolean)) {
     const g = gearById(id);
     g.cells.forEach(([x, y, k]) => { const px = ox + x * cs, py = oy + y * cs; block(px, py, g.pal[k], y >= 0 ? liftAt(px, py, t) : 0, tint); });
   }
@@ -1845,22 +1877,32 @@ function drawGear(who, ox, oy, t, tint) {                   // blocks on top of 
 const PREVIEW_ROWS = { echo: ['O.....O', 'OOOWOOO', 'OEOWOEO', 'OOWPWOO', '.WWWWW.', '.oWWWo.', '.OWWWO.', '.WW.WW.'], yoko: ['F.....F', 'FFfFfFF', 'FEFFFEF', 'FFFPFFF', '.FyyyF.', '.FfyfF.', '.FfFfF.', '.Ff.fF.'] };
 let dressWho = 'echo', dressTry = null;
 const cssRgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+const REWARD_ICONS = { scarf: ['#4678dc', 3, 1], bow: ['#ff7fb0', 3, 1], crown: ['#f2c14e', 3, 1], visor: ['#1e1c2d', 3, 1], glow: ['#ffc94a', 3, 1], ycrown: ['#f2c14e', 3, 1] };
+const rewardIcon = id => `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3" shape-rendering="crispEdges"><rect x="0" y="1" width="5" height="1.02" fill="${REWARD_ICONS[id][0]}"/><rect x="1" y="0" width="3" height="1.02" fill="${REWARD_ICONS[id][0]}"/></svg>`)}')`;
 function gearIcon(g) {                                      // a tiny pixel picture of the item, for its button
   const xs = g.cells.map(c => c[0]), ys = g.cells.map(c => c[1]), x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0 + 1, h = Math.max(...ys) - y0 + 1;
   const rects = g.cells.map(([x, y, k]) => `<rect x="${x - x0}" y="${y - y0}" width="1.02" height="1.02" fill="${cssRgb(g.pal[k])}"/>`).join('');
   return `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 ${w + 2} ${h + 2}" shape-rendering="crispEdges">${rects}</svg>`)}')`;
 }
 function previewWorn() { const w = { ...dress.worn[dressWho] }; if (dressTry) w[gearById(dressTry).slot] = dressTry; return w; }
+function previewRows() {                                    // the cat's body, including any earned reward that is switched on
+  const rows = [...PREVIEW_ROWS[dressWho]];
+  if (dressWho === 'echo') { if (rewardShown('scarf')) rows[4] = '.BBBBB.'; if (rewardShown('bow')) rows[0] = 'OVV.VVO'; if (rewardShown('visor')) rows[2] = 'OSSSSSO'; }
+  else if (rewardShown('ycrown')) rows[0] = 'F.YYY.F';
+  return rows;
+}
 function drawDressPreview() {
   const cv = $('dressCanvas'), g = cv.getContext('2d'), u = 28, pal = dressWho === 'echo' ? BOT_PAL : YOKO_PAL, oy = 3 * u;
   g.clearRect(0, 0, cv.width, cv.height);
   const cell = (x, y, c) => { g.fillStyle = `rgb(${c[0] * .6 | 0},${c[1] * .6 | 0},${c[2] * .6 | 0})`; g.fillRect(x * u, y * u, u, u); g.fillStyle = cssRgb(c); g.fillRect(x * u, y * u, u - 2, u - 3); };
-  PREVIEW_ROWS[dressWho].forEach((row, r) => [...row].forEach((ch, k) => {
+  previewRows().forEach((row, r) => [...row].forEach((ch, k) => {
     if (ch === '.') return;
     cell(k, r + 3, pal[ch]);
     if (ch === 'E') { g.fillStyle = '#2a1d14'; g.fillRect(k * u + 9, (r + 3) * u + 6, 8, 14); g.fillStyle = '#fff'; g.fillRect(k * u + 9, (r + 3) * u + 6, 3, 3); }
   }));
-  for (const id of Object.values(previewWorn())) { const it = gearById(id); it.cells.forEach(([x, y, k]) => cell(x, y + 3, it.pal[k])); }
+  if (dressWho === 'echo' && rewardShown('crown')) [[1, -1], [3, -2], [5, -1], [2, -1], [4, -1]].forEach(([x, y]) => cell(x, y + 3, BOT_PAL.Y));
+  const pw = previewWorn();
+  for (const id of DRAW_ORDER.map(sl => pw[sl]).filter(Boolean)) { const it = gearById(id); it.cells.forEach(([x, y, k]) => cell(x, y + 3, it.pal[k])); }
 }
 function renderDress() {
   const have = S.treats || 0;
@@ -1868,21 +1910,29 @@ function renderDress() {
   $('dressWho').querySelectorAll('[data-who]').forEach(b => b.setAttribute('aria-pressed', b.dataset.who === dressWho));
   const worn = dress.worn[dressWho], name = CAT_NAMES[dressWho], it = dressTry && gearById(dressTry);
   const bar = $('dressBar');
-  if (!it) bar.innerHTML = `<span>Tap an item to try it on ${name}.</span>${Object.keys(worn).length ? '<button class="btn" data-act="clear">Take everything off</button>' : ''}`;
+  const mine = REWARDS.filter(r => r.cat === dressWho && r.has()), anyOn = Object.keys(worn).length || mine.some(r => rewardShown(r.id)), anyHidden = mine.some(r => dress.off.includes(r.id));
+  if (!it) bar.innerHTML = `<span>Tap an item to try it on ${name}.</span>${anyOn ? '<button class="btn" data-act="clear">Take everything off</button>' : ''}${anyHidden ? '<button class="btn" data-act="back">Put rewards back on</button>' : ''}`;
   else if (!dress.owned.includes(it.id)) bar.innerHTML = have >= it.cost
     ? `<button class="btn primary" data-act="buy">Buy ${esc(it.name)} for ${it.cost} treats</button>`
     : `<span>${esc(it.name)} costs ${it.cost} treats. You need ${it.cost - have} more.</span>`;
   else bar.innerHTML = worn[it.slot] === it.id ? `<button class="btn" data-act="off">Take off ${esc(it.name)}</button>` : `<button class="btn primary" data-act="wear">Put ${esc(it.name)} on ${name}</button>`;
+  const rewardHtml = `<div class="dress-slot"><h3>Rewards ${name} has earned</h3><div class="dress-grid">${mine.length ? mine.map(r => {
+    const on = !dress.off.includes(r.id);
+    return `<button class="gear${on ? ' on' : ''}" data-reward="${r.id}"><i style="background-image:${rewardIcon(r.id)}"></i>${esc(r.name)}<small>${on ? 'showing' : 'hidden'}</small></button>`; }).join('') : `<p class="note">Nothing yet. Finish a pack or catch snacks (25 earns a visor, 50 a glow) to unlock rewards.</p>`}</div></div>`;
   $('dressShop').innerHTML = GEAR_SLOTS.map(([slot, label]) => `<div class="dress-slot"><h3>${label}</h3><div class="dress-grid">${GEAR.filter(g => g.slot === slot).map(g => {
     const owned = dress.owned.includes(g.id), on = worn[slot] === g.id;
-    return `<button class="gear${g.id === dressTry ? ' sel' : ''}${on ? ' on' : ''}" data-gear="${g.id}" aria-pressed="${g.id === dressTry}"><i style="background-image:${gearIcon(g)}"></i>${esc(g.name)}<small>${on ? 'wearing' : owned ? 'owned' : g.cost + ' treats'}</small></button>`; }).join('')}</div></div>`).join('');
+    return `<button class="gear${g.id === dressTry ? ' sel' : ''}${on ? ' on' : ''}" data-gear="${g.id}" aria-pressed="${g.id === dressTry}"><i style="background-image:${gearIcon(g)}"></i>${esc(g.name)}<small>${on ? 'wearing' : owned ? 'owned' : g.cost + ' treats'}</small></button>`; }).join('')}</div></div>`).join('') + rewardHtml;
   drawDressPreview();
 }
 $('dressWho').onclick = e => { const b = e.target.closest('[data-who]'); if (!b) return; dressWho = b.dataset.who; dressTry = null; renderDress(); };
-$('dressShop').onclick = e => { const b = e.target.closest('[data-gear]'); if (!b) return; dressTry = dressTry === b.dataset.gear ? null : b.dataset.gear; renderDress(); };
+$('dressShop').onclick = e => {
+  const rw = e.target.closest('[data-reward]');
+  if (rw) { const i = dress.off.indexOf(rw.dataset.reward); if (i < 0) dress.off.push(rw.dataset.reward); else dress.off.splice(i, 1); saveDress(); renderDress(); return; }
+  const b = e.target.closest('[data-gear]'); if (!b) return; dressTry = dressTry === b.dataset.gear ? null : b.dataset.gear; renderDress(); };
 $('dressBar').onclick = e => {
   const act = e.target.closest('[data-act]')?.dataset.act, it = dressTry && gearById(dressTry), worn = dress.worn[dressWho];
-  if (act === 'clear') dress.worn[dressWho] = {};
+  if (act === 'clear') { dress.worn[dressWho] = {}; for (const r of REWARDS) if (r.cat === dressWho && !dress.off.includes(r.id)) dress.off.push(r.id); }
+  else if (act === 'back') dress.off = dress.off.filter(id => REWARDS.find(r => r.id === id).cat !== dressWho);
   else if (it && act === 'off') delete worn[it.slot];
   else if (it && act === 'wear') worn[it.slot] = it.id;
   else if (it && act === 'buy') {
